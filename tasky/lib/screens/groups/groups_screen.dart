@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasky/models/group.dart';
 import 'package:tasky/screens/home/home_screen.dart';
 import 'package:tasky/services/auth.dart';
 import 'package:tasky/services/database.dart';
@@ -12,7 +13,7 @@ class _GroupScreenState extends State<GroupScreen> {
   final AuthService _auth = AuthService();
   final DatabaseService _dbService = DatabaseService();
   String? userName;
-  List<String> groups = []; // List to store group IDs
+  List<Group> groups = []; // List to store group IDs
   String? userId;
 
   @override
@@ -289,10 +290,10 @@ class _GroupScreenState extends State<GroupScreen> {
                 itemCount: groups.length,
                 itemBuilder: (context, index) {
                   return Dismissible(
-                    key: Key(groups[index]),
+                    key: Key(groups[index].id),
                     direction: DismissDirection.endToStart,
                     confirmDismiss: (direction) async {
-                      return await _confirmDeleteGroup(groups[index]);
+                      return await _confirmDeleteGroup(groups[index].id);
                     },
                     onDismissed: (direction) {
                       setState(() {
@@ -313,7 +314,7 @@ class _GroupScreenState extends State<GroupScreen> {
                       ),
                       child: ListTile(
                         title: Text(
-                          groups[index],
+                          groups[index].name,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -325,8 +326,10 @@ class _GroupScreenState extends State<GroupScreen> {
                             context,
                             MaterialPageRoute(
                               builder:
-                                  (context) =>
-                                      HomeScreen(groupName: groups[index]),
+                                  (context) => HomeScreen(
+                                    groupName: groups[index].name,
+                                    groupId: groups[index].id,
+                                  ),
                             ),
                           );
                         },

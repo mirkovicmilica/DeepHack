@@ -4,10 +4,10 @@ import '../current_tasks/current_tasks_screen.dart';
 import '../leaderboard/leaderboard_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String
-  groupName; // Pass the group name to display which group is currently active
+  final String groupName;
+  final String groupId;
 
-  HomeScreen({required this.groupName});
+  HomeScreen({required this.groupName, required this.groupId});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -16,11 +16,19 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    TaskSwipeScreen(),
-    CurrentTasksScreen(),
-    LeaderboardScreen(),
-  ];
+  // Declare the screens list, but do not initialize it with the groupId yet.
+  late List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the screens list in the initState method.
+    _screens = [
+      TaskSwipeScreen(groupId: widget.groupId),
+      CurrentTasksScreen(),
+      LeaderboardScreen(),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -34,16 +42,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(
           '${widget.groupName}',
-          style: TextStyle(
-            color: Theme.of(context).primaryColor, // Title uses primary color
-          ),
+          style: TextStyle(color: Theme.of(context).primaryColor),
         ),
-        iconTheme: IconThemeData(
-          color:
-              Theme.of(
-                context,
-              ).primaryColor, // Set the color of the back button
-        ),
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
       ),
       body: SafeArea(
         child: IndexedStack(index: _selectedIndex, children: _screens),

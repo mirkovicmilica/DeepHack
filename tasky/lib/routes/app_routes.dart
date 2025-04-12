@@ -22,7 +22,7 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     login: (_) => LoginScreen(),
     signup: (_) => SignupScreen(),
-    tasks: (_) => TaskSwipeScreen(),
+    // tasks: (_) => TaskSwipeScreen(),
     currentTasks: (_) => CurrentTasksScreen(),
     leaderboard: (_) => LeaderboardScreen(),
     authentication: (_) => AuthenticationScreen(),

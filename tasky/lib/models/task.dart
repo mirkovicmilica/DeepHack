@@ -58,6 +58,20 @@ class Task {
     );
   }
 
+  factory Task.fromFirestore(Map<String, dynamic> data) {
+    return Task(
+      title: data['title'] ?? '',
+      creator: data['createdBy'] ?? '',
+      reward: data['reward'] ?? 0,
+      icon: Icons.assignment, // Default icon
+      avatarUrl: data['avatarUrl'] ?? "https://example.com/default_avatar.jpg",
+      description: data['description'] ?? '',
+      status: data['status'] ?? 'incomplete',
+      upvotes: data['upvotes'] ?? 0,
+      downvotes: data['downvotes'] ?? 0,
+    );
+  }
+
   // Optionally, you can add a toString method for easy debugging
   @override
   String toString() {

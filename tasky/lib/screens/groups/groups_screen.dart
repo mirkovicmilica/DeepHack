@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tasky/screens/home/home_screen.dart';
 import 'package:tasky/services/auth.dart';
+import 'package:tasky/services/database.dart';
 
 class GroupScreen extends StatefulWidget {
   @override
@@ -9,9 +10,39 @@ class GroupScreen extends StatefulWidget {
 
 class _GroupScreenState extends State<GroupScreen> {
   final AuthService _auth = AuthService();
-  List<String> groups = []; // List to store group names
+  final DatabaseService _dbService = DatabaseService();
+  String? userName;
+  List<String> groups = []; // List to store group IDs
+  String? userId;
 
-  // Create a new group with an editable name
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() async {
+    Map<String, dynamic>? userData = await _dbService.getCurrentUserData();
+    if (!mounted) return; // Make sure the widget is still in the tree
+
+    if (userData != null && userData['uid'] != null) {
+      setState(() {
+        userName = userData['name'] ?? 'User';
+        userId =
+            userData['uid']; // Add this line if userId is a member variable
+      });
+
+      final userGroups = await _dbService.getUserGroups(userData['uid']);
+      if (!mounted) return;
+      setState(() {
+        groups = userGroups;
+      });
+    } else {
+      print('User data or UID is missing.');
+    }
+  }
+
+  // Create a new group
   void _createGroup() async {
     String? groupName = await showDialog<String>(
       context: context,
@@ -68,17 +99,23 @@ class _GroupScreenState extends State<GroupScreen> {
         // Ask for new group name if 'Create New Group' is selected
         String? newGroupName = await _showGroupNameDialog();
         if (newGroupName != null && newGroupName.isNotEmpty) {
-          setState(() {
-            groups.add(newGroupName); // Add new group to the list
-          });
+          // Ensure that userName is not null before using it
+          if (userId != null) {
+            // Create group and add user to it
+            await _dbService.createGroup(newGroupName, userId!);
+            _loadUserData(); // Reload groups after creating the group
+          } else {
+            // Handle the case where userName is null
+            print('Error: userName is null.');
+          }
         }
       } else if (groupName == 'add') {
         // Ask for group ID if 'Add by Group ID' is selected
         String? groupId = await _showGroupIdDialog();
         if (groupId != null && groupId.isNotEmpty) {
-          setState(() {
-            groups.add(groupId); // Add existing group by ID
-          });
+          // Add user to existing group
+          await _dbService.addGroupById(groupId, userId!);
+          _loadUserData(); // Reload groups after adding to the group
         }
       }
     }
@@ -209,8 +246,19 @@ class _GroupScreenState extends State<GroupScreen> {
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
+          if (userName != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Text(
+                userName!,
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           TextButton.icon(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.logout),
             label: Text('Log out'),
             onPressed: () async {
               await _auth.signOut();
@@ -244,79 +292,54 @@ class _GroupScreenState extends State<GroupScreen> {
                     key: Key(groups[index]),
                     direction: DismissDirection.endToStart,
                     confirmDismiss: (direction) async {
-                      // Show confirmation dialog before dismissing
                       return await _confirmDeleteGroup(groups[index]);
                     },
                     onDismissed: (direction) {
-                      // Remove the group from the list when dismissed
                       setState(() {
-                        groups.removeAt(
-                          index,
-                        ); // Remove the group at the given index
+                        groups.removeAt(index);
                       });
                     },
                     background: Container(
                       color: Colors.red,
-                      child: Icon(Icons.delete, color: Colors.white),
                       alignment: Alignment.centerRight,
                       padding: EdgeInsets.only(right: 20),
+                      child: Icon(Icons.delete, color: Colors.white),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Container(
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(2, 4),
-                              blurRadius: 6,
-                            ),
-                          ],
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            // Navigate to home screen for the selected group
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => HomeScreen(
-                                      groupName:
-                                          groups[index], // Pass the group name
-                                    ),
-                              ),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(12),
-                          child: Center(
-                            child: Text(
-                              groups[index],
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                              ),
-                            ),
+                    child: Card(
+                      margin: EdgeInsets.all(8),
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        title: Text(
+                          groups[index],
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
+                        trailing: Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      HomeScreen(groupName: groups[index]),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   );
                 },
               ),
             ),
+            // Add Group button
+            ElevatedButton(onPressed: _createGroup, child: Text('Add Group')),
           ],
         ),
-      ),
-      // Floating action button for creating a new group
-      floatingActionButton: FloatingActionButton(
-        onPressed: _createGroup, // Trigger the create group function
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        child: Icon(Icons.add), // The plus icon
       ),
     );
   }

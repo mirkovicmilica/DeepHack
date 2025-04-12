@@ -13,6 +13,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
   // Sample list of tasks - normally you might fetch this data from a service
   List<Task> tasks = [
     Task(
+      id: "123",
       title: "Clean kitchen",
       creator: "You",
       reward: 5,
@@ -23,6 +24,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
       status: 'assigned',
     ),
     Task(
+      id: '1234',
       title: "Mop floor",
       creator: "Charlie",
       reward: 3,
@@ -32,6 +34,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
       status: 'assigned',
     ),
     Task(
+      id: '12',
       title: "Wash windows",
       creator: "Alice",
       reward: 4,

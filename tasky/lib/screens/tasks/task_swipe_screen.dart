@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tasky/models/task.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tasky/services/database.dart'; // Make sure this is correct
+import 'package:tasky/services/auth.dart';
 
 class TaskSwipeScreen extends StatefulWidget {
   final String groupId;
@@ -60,47 +61,53 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                     key: Key('${task.title}-$index'),
                     direction: DismissDirection.horizontal,
                     background: Container(
-                      color: Colors.red.withOpacity(0.2), // subtle green tint
+                      color: Colors.green.withOpacity(0.2), // subtle green tint
                       alignment: Alignment.centerLeft,
                       padding: EdgeInsets.only(left: 32),
                       child: Text(
-                        'Decline',
+                        'Accept',
                         style: TextStyle(
                           color:
                               Colors
-                                  .red, // use green text instead of full white block
+                                  .green, // use green text instead of full white block
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     secondaryBackground: Container(
-                      color: Colors.green.withOpacity(0.2), // subtle red tint
+                      color: Colors.red.withOpacity(0.2), // subtle red tint
                       alignment: Alignment.centerRight,
                       padding: EdgeInsets.only(right: 32),
                       child: Text(
-                        'Accept',
+                        'Decline',
                         style: TextStyle(
-                          color: Colors.green,
+                          color: Colors.red,
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    onDismissed: (direction) {
+                    onDismissed: (direction) async {
                       setState(() {
                         tasks.removeAt(taskIndex);
                       });
-                      if (direction == DismissDirection.endToStart) {
-                        // Swiped right = accepted
+                      final currentUserId = AuthService().getCurrentUserId();
+
+                      if (currentUserId == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("${task.title} accepted")),
+                          SnackBar(content: Text("User not logged in")),
                         );
-                      } else {
-                        // Swiped left = declined
+                        return;
+                      }
+                      if (direction == DismissDirection.endToStart) {
+                        // Swiped right = declined
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("${task.title} declined")),
                         );
+                      } else {
+                        // Swiped left = accepted
+                        await _dbService.acceptTask(task, currentUserId);
                       }
                     },
                     child: Card(

@@ -14,6 +14,10 @@ class AuthService {
     return _auth.authStateChanges().map(_userFromFirebaseUser);
   }
 
+  String? getCurrentUserId() {
+    return _auth.currentUser?.uid;
+  }
+
   // sign in anon
   Future signInAnon() async {
     try {

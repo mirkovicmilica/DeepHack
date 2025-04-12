@@ -4,12 +4,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 class Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: SpinKitChasingDots(
-          size: 50
-        ),
-      ),
-    )
+    return Container(child: Center(child: SpinKitChasingDots(size: 50)));
   }
 }

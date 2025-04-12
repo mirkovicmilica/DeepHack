@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../tasks/task_swipe_screen.dart';
 import '../current_tasks/current_tasks_screen.dart';
 import '../leaderboard/leaderboard_screen.dart';
+import '../store/store_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String groupName;
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
       TaskSwipeScreen(groupId: widget.groupId),
       CurrentTasksScreen(),
       LeaderboardScreen(),
+      StoreScreen(), // Add StoreScreen here
     ];
   }
 
@@ -52,12 +54,38 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Tasks'),
-          BottomNavigationBarItem(icon: Icon(Icons.check), label: 'Current'),
+        items:  [
           BottomNavigationBarItem(
-            icon: Icon(Icons.leaderboard),
+            icon: Image.asset(
+              'assets/icons/tasks.png', // Use the image from assets
+              width: 30,
+              height: 30,
+            ),
+            label: 'Tasks',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/current.png',
+              width: 30,
+              height: 30,
+            ),
+            label: 'Current',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/leaderboard.png', // Use the image from assets
+              width: 30,
+              height: 30,
+            ),
             label: 'Leaderboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/store.png',
+              width: 30,
+              height: 30,
+            ),
+            label: 'Store',
           ),
         ],
       ),

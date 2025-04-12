@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "560423012552",
+    "project_id": "tasky-74e6b",
+    "storage_bucket": "tasky-74e6b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:560423012552:android:268c51a51836a2393c3dfd",
+        "android_client_info": {
+          "package_name": "com.deephack.tasky"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3w0m7ar2n4eoTFGLJZ7V_6dSaCWwt_jQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

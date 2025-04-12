@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tasky/models/task.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:tasky/services/database.dart'; // Make sure this is correct
 
 class TaskSwipeScreen extends StatefulWidget {
@@ -55,48 +56,100 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                   int taskIndex = index % tasks.length;
                   final task = tasks[taskIndex];
 
-                  return Card(
-                    margin: EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(task.title, style: TextStyle(fontSize: 24)),
-                        SizedBox(height: 10),
-                        Text("Created by: ${task.creator}"),
-                        Text("Reward: ${task.reward} pts"),
-                        SizedBox(height: 20),
-                        task.status == 'completed'
-                            ? Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.thumb_up,
-                                    color: Colors.green,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      task.upvotes++;
-                                    });
-                                  },
-                                ),
-                                Text("${task.upvotes}"),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.thumb_down,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      task.downvotes++;
-                                    });
-                                  },
-                                ),
-                                Text("${task.downvotes}"),
-                              ],
-                            )
-                            : SizedBox.shrink(),
-                      ],
+                  return Dismissible(
+                    key: Key('${task.title}-$index'),
+                    direction: DismissDirection.horizontal,
+                    background: Container(
+                      color: Colors.red.withOpacity(0.2), // subtle green tint
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.only(left: 32),
+                      child: Text(
+                        'Decline',
+                        style: TextStyle(
+                          color:
+                              Colors
+                                  .red, // use green text instead of full white block
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    secondaryBackground: Container(
+                      color: Colors.green.withOpacity(0.2), // subtle red tint
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.only(right: 32),
+                      child: Text(
+                        'Accept',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    onDismissed: (direction) {
+                      setState(() {
+                        tasks.removeAt(taskIndex);
+                      });
+                      if (direction == DismissDirection.endToStart) {
+                        // Swiped right = accepted
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("${task.title} accepted")),
+                        );
+                      } else {
+                        // Swiped left = declined
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("${task.title} declined")),
+                        );
+                      }
+                    },
+                    child: Card(
+                      elevation: 8,
+                      margin: EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Container(
+                        // Expand to fill available space
+                        width: double.infinity,
+                        height: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 32,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              task.title,
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "Created by: ${task.creator}",
+                              style: TextStyle(fontSize: 20),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Reward: ${task.reward} pts",
+                              style: TextStyle(fontSize: 20),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 24),
+                            Text(
+                              task.description,
+                              style: TextStyle(fontSize: 18),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 },

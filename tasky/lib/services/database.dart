@@ -105,7 +105,7 @@ class DatabaseService {
     String? assignedTo,
     String? description,
     int reward = 0,
-    String status = 'assigned',
+    String status = 'incomplete',
     String avatarUrl = 'https://example.com/default_avatar.jpg',
     IconData icon = Icons.assignment,
     DateTime? dueDate,
@@ -119,7 +119,8 @@ class DatabaseService {
       'title': title,
       'description': description ?? '',
       'groupId': groupId,
-      'createdBy': currentUserId, 'assignedTo': assignedTo,
+      'createdBy': currentUserId,
+      'assignedTo': assignedTo,
       'status': status,
       'reward': reward,
       'avatarUrl': avatarUrl,
@@ -146,7 +147,16 @@ class DatabaseService {
 
     return querySnapshot.docs.map((doc) {
       final data = doc.data();
+      data['id'] = doc.id;
       return Task.fromFirestore(data);
     }).toList();
+  }
+
+  Future<void> acceptTask(Task task, String currentUserId) async {
+    // Update the task in Firestore
+    await _db.collection('tasks').doc(task.id).update({
+      'status': 'accepted',
+      'assignedTo': currentUserId,
+    });
   }
 }

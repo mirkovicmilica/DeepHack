@@ -1,14 +1,14 @@
-# 📌 Taskify
+# 📌 Tasky
 
-### Welcome to **Taskify** 🎯 – the ultimate cross-platform Flutter app, powered by Firebase, that turns everyday chores and tasks into fun, collaborative, and rewarding experiences! Whether you're sharing a house, working on a school project, or just looking to stay productive with your partner or coworkers, **Taskify** helps you stay on top of responsibilities by assigning, verifying, and rewarding completed tasks in an engaging and gamified way.
+### Welcome to **Tasky** 🎯 – the ultimate cross-platform Flutter app, powered by Firebase, that turns everyday chores and tasks into fun, collaborative, and rewarding experiences! Whether you're sharing a house, working on a school project, or just looking to stay productive with your partner or coworkers, **Tasky** helps you stay on top of responsibilities by assigning, verifying, and rewarding completed tasks in an engaging and gamified way.
 
-Create and manage task groups effortlessly – from student homes and classrooms to offices and couples. Each group is tailored to its context: roommates can handle household chores, classmates manage homework and quizzes, and couples can assign fun or helpful tasks to each other. Earn points, compete for monthly prizes, and even redeem your hard work in a custom in-app store – Taskify makes productivity social and fun!
+Create and manage task groups effortlessly – from student homes and classrooms to offices and couples. Each group is tailored to its context: roommates can handle household chores, classmates manage homework and quizzes, and couples can assign fun or helpful tasks to each other. Earn points, compete for monthly prizes, and even redeem your hard work in a custom in-app store – Tasky makes productivity social and fun!
 
 ---
 
 ## 🚀 Overview
 
-Taskify empowers users to:
+Tasky empowers users to:
 - Create and join groups for task sharing.
 - Assign tasks with descriptions, photos, and point-based rewards.
 - Verify task completion through community voting.
@@ -32,7 +32,7 @@ Taskify empowers users to:
 
 ## 🎯 Example Usage
 
-Taskify is perfect for:
+Tasky is perfect for:
 - 🏠 **Student Housing** – Gamify household chores with roommates.
 - 🎓 **Educational Projects** – Collaboratively manage schoolwork, assignments, and quizzes.
 - 💼 **Workplaces** – Organize professional tasks and foster teamwork through incentives.

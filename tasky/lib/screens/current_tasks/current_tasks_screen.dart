@@ -120,10 +120,13 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
                                 ? Colors.green
                                 : Colors.grey,
                       ),
-                      onPressed: () async {
-                        await _dbService.voteOnTask(task.id, 1);
-                        _loadTasks(); // reload to reflect change
-                      },
+                      onPressed:
+                          task.assignedTo == currentUserId
+                              ? null //
+                              : () async {
+                                await _dbService.voteOnTask(task.id, 1);
+                                _loadTasks();
+                              },
                     ),
                     Text("${task.upvotes}"),
                     IconButton(
@@ -134,10 +137,13 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
                                 ? Colors.red
                                 : Colors.grey,
                       ),
-                      onPressed: () async {
-                        await _dbService.voteOnTask(task.id, -1);
-                        _loadTasks();
-                      },
+                      onPressed:
+                          task.assignedTo == currentUserId
+                              ? null
+                              : () async {
+                                await _dbService.voteOnTask(task.id, -1);
+                                _loadTasks();
+                              },
                     ),
                     Text("${task.downvotes}"),
                   ],
@@ -198,9 +204,9 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
     print("SHOW COMPLETE");
     print(task);
     if (task.imageUrl.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("No image available for this task.")),
-      );
+      //ScaffoldMessenger.of(context).showSnackBar(
+      //SnackBar(content: Text("No image available for this task.")),
+      //);
       return;
     }
 

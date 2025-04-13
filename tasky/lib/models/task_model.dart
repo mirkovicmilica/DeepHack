@@ -11,6 +11,7 @@ class TaskModel {
   final String description;
   String imageUrl;
   String assignedTo;
+  String assignedToName;
   String status; // Can be "assigned", "completed", etc.
   Map<String, int> votes;
 
@@ -24,6 +25,7 @@ class TaskModel {
     required this.avatarUrl,
     required this.description,
     this.assignedTo = '',
+    this.assignedToName = '',
     this.status = 'assigned', // Default status is 'assigned'
     this.imageUrl = '',
     this.votes = const {},
@@ -43,6 +45,7 @@ class TaskModel {
       'assignedTo': assignedTo,
       'imageUrl': imageUrl,
       'votes': votes,
+      'assignedToName': assignedToName,
     };
   }
 
@@ -60,6 +63,7 @@ class TaskModel {
       assignedTo: map['assignedTo'] ?? '',
       imageUrl: map['imageUrl'] ?? '',
       votes: Map<String, int>.from(map['votes'] ?? {}),
+      assignedToName: map['assignedToName'] ?? '',
     );
   }
 
@@ -76,6 +80,7 @@ class TaskModel {
       assignedTo: data['assignedTo'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
       votes: Map<String, int>.from(data['votes'] ?? {}),
+      assignedToName: data['assignedToName'] ?? '',
     );
   }
 

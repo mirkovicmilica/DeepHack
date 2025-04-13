@@ -16,6 +16,8 @@ class TaskSwipeScreen extends StatefulWidget {
 
 class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
   List<TaskModel> tasks = [];
+  Map<String, String> creatorNames = {};
+
   bool isLoading = true;
   final DatabaseService _dbService = DatabaseService();
 
@@ -29,8 +31,20 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
     final fetchedTasks = await _dbService.getIncompleteTasksForGroup(
       widget.groupId,
     );
+
+    // Fetch unique creator IDs
+    final creatorIds = fetchedTasks.map((task) => task.creator).toSet();
+
+    final namesMap = <String, String>{};
+
+    for (final id in creatorIds) {
+      final name = await _dbService.getUserNameById(id);
+      namesMap[id] = name ?? "Unknown";
+    }
+    if (!mounted) return;
     setState(() {
       tasks = fetchedTasks;
+      creatorNames = namesMap;
       isLoading = false;
     });
   }
@@ -128,7 +142,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       } else {
                         print(currentUserId);
                         // Swiped left = accepted
-                        await _dbService.acceptTask(task, currentUserId);
+                        await _dbService.acceptTask(task);
                       }
                     },
                     child: Card(
@@ -139,7 +153,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       ),
                       child: Container(
                         // Expand to fill available space
-                        color: const Color.fromARGB(255,215,215,215),
+                        color: const Color.fromARGB(255, 215, 215, 215),
                         width: double.infinity,
                         height: double.infinity,
                         padding: EdgeInsets.symmetric(
@@ -187,7 +201,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Nick",
+                                        "Created by: ${creatorNames[task.creator] ?? 'Loading...'}",
                                         style: TextStyle(fontSize: 20),
                                       ),
                                       Row(
@@ -241,6 +255,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
     final _descriptionController = TextEditingController();
     final _avatarUrlController = TextEditingController();
     final _iconController = TextEditingController();
+    _iconController.text = 'missing';
 
     showDialog(
       context: context,
@@ -285,6 +300,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                             'toilet-paper',
                             'vacum',
                             'walk-pet',
+                            'missing',
                           ]
                           .map(
                             (code) => DropdownMenuItem(

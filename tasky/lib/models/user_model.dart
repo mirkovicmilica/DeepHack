@@ -1,4 +1,5 @@
 class UserModel {
   final String? uid;
-  UserModel({this.uid});
+  final int points;
+  UserModel({this.uid, this.points = 0});
 }

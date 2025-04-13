@@ -25,7 +25,7 @@ class AppRoutes {
     signup: (_) => SignupScreen(),
     // tasks: (_) => TaskSwipeScreen(),
     // currentTasks: (_) => CurrentTasksScreen(),
-    leaderboard: (_) => LeaderboardScreen(),
+    // leaderboard: (_) => LeaderboardScreen(),
     authentication: (_) => AuthenticationScreen(),
     group: (_) => GroupScreen(),
     wrapper: (_) => Wrapper(),

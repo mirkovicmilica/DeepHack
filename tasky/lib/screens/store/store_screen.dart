@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tasky/services/database.dart';
 
 class StoreScreen extends StatefulWidget {
   final int userGems;
@@ -10,7 +12,8 @@ class StoreScreen extends StatefulWidget {
 
 class _StoreScreenState extends State<StoreScreen> {
   late int userGems;
-
+  String? currentUserId;
+  final DatabaseService _dbService = DatabaseService();
 
   final List<StoreItem> items = [
     StoreItem(name: 'massage', imagePath: 'assets/icons/massage.png', gems: 50),
@@ -22,16 +25,24 @@ class _StoreScreenState extends State<StoreScreen> {
   ];
 
   @override
-    void initState() {
-      super.initState();
-      userGems = widget.userGems;
-    }
-  void _updateGems(int newAmount) {
+  void initState() {
+    super.initState();
+    userGems = widget.userGems;
+    currentUserId = FirebaseAuth.instance.currentUser?.uid;
+  }
+
+  void _updateGems(int newAmount) async {
     setState(() {
       userGems = newAmount;
     });
+
+    // Update in the parent widget
     widget.onGemsChanged(userGems);
+
+    // Update in Firestore
+    await _dbService.updateUserPoints(currentUserId!, newAmount);
   }
+
   void _showSnackBar(BuildContext context, StoreItem item) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
@@ -52,13 +63,15 @@ class _StoreScreenState extends State<StoreScreen> {
             onPressed: () {
               _updateGems(userGems + item.gems);
 
-
               scaffoldMessenger.showSnackBar(
                 SnackBar(
                   content: Text('Purchase of ${item.name} was removed.'),
                   duration: Duration(seconds: 2),
                   behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -104,15 +117,26 @@ class _StoreScreenState extends State<StoreScreen> {
                     margin: const EdgeInsets.symmetric(vertical: 10),
                     color: isAffordable ? Colors.white : Colors.grey[300],
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      leading: Image.asset(item.imagePath, width: 40, height: 40),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      leading: Image.asset(
+                        item.imagePath,
+                        width: 40,
+                        height: 40,
+                      ),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text('${item.gems}', style: TextStyle(fontSize: 16)),
                           const SizedBox(width: 6),
-                          Image.asset('assets/icons/gem.png', width: 24, height: 24),
+                          Image.asset(
+                            'assets/icons/gem.png',
+                            width: 24,
+                            height: 24,
+                          ),
                         ],
                       ),
                     ),

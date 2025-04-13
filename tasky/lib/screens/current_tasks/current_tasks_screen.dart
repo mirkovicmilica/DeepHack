@@ -1,69 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:tasky/models/task.dart'; // Import your Task model
+import 'package:tasky/models/task.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tasky/services/database.dart'; // Make sure this is correct
+import 'package:tasky/models/group.dart';
 
-// Define a stateful widget for the current tasks screen
 class CurrentTasksScreen extends StatefulWidget {
+    final String groupId;
+  CurrentTasksScreen({required this.groupId});
   @override
   _CurrentTasksScreenState createState() => _CurrentTasksScreenState();
 }
 
-// The mutable state for the CurrentTasksScreen widget
 class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
-  // Sample list of tasks - normally you might fetch this data from a service
-  List<Task> tasks = [
-    Task(
-      id: "123",
-      title: "Clean kitchen",
-      creator: "You",
-      reward: 5,
-      icon: Icons.kitchen,
-      avatarUrl: "https://example.com/your_avatar.jpg",
-      description: "Clean the kitchen thoroughly.",
-      // Note: No status given, so it defaults to null. In our filtering, it must be 'assigned'
-      status: 'assigned',
-    ),
-    Task(
-      id: '1234',
-      title: "Mop floor",
-      creator: "Charlie",
-      reward: 3,
-      icon: Icons.cleaning_services,
-      avatarUrl: "https://example.com/charlie_avatar.jpg",
-      description: "Mop the floor of the living room.",
-      status: 'assigned',
-    ),
-    Task(
-      id: '12',
-      title: "Wash windows",
-      creator: "Alice",
-      reward: 4,
-      icon: Icons.window,
-      avatarUrl: "https://example.com/alice_avatar.jpg",
-      description: "Clean the windows in the house.",
-      status: 'completed', // This task is marked as completed
-      upvotes: 5,
-      downvotes: 1,
-    ),
-  ];
+  List<Task> assignedTasks = [];
+  List<Task> completedTasks = [];
+  late DatabaseService databaseService;
+  late String groupId = widget.groupId; // Define the groupId to fetch tasks
+
+  @override
+  void initState() {
+    super.initState();
+    databaseService = DatabaseService();
+    groupId = widget.groupId;
+    // Load the groupId (you need to ensure you have this)
+    // groupId = "your_group_id"; // Replace this with the actual group ID
+
+    _loadTasks();
+  }
+
+  Future<void> _loadTasks() async {
+    try {
+      // Fetch the assigned and pending tasks using the database service
+      Map<String, List<Task>> taskData =
+          await databaseService.getAssignedAndPendingApprovalTasks(groupId);
+      setState(() {
+        assignedTasks = taskData['assignedTasks']!;
+        completedTasks = taskData['pendingApprovalTasks']!;
+      });
+    } catch (e) {
+      print('Error loading tasks: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Filter tasks that are assigned based on their 'status' property
-    List<Task> assignedTasks =
-        tasks.where((task) => task.status == 'assigned').toList();
-
-    // Filter tasks that are completed based on their 'status' property
-    List<Task> completedTasks =
-        tasks.where((task) => task.status == 'completed').toList();
-
-    // Sort the completed tasks in descending order by number of upvotes
-    completedTasks.sort((a, b) => b.upvotes.compareTo(a.upvotes));
-
     return ListView(
-      // ListView holds all our sections as a vertical list
       children: [
-        // Header for the Assigned Tasks section with padding
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
@@ -71,9 +53,8 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        // Map over the assignedTasks to create a list of swipeable items
         ...assignedTasks.map((task) {
-          final isAssignedToYou = task.creator == "You";
+          final isAssignedToYou = task.creator == "You"; // Modify as per your logic
 
           return Card(
             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -81,18 +62,20 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
             child: ListTile(
               title: Text(task.title),
               subtitle: Text("Assigned to: ${task.creator}"),
-              trailing:
-                  isAssignedToYou
-                      ? Icon(Icons.pending_actions, color: Colors.orange)
-                      : Icon(Icons.lock_outline, color: Colors.grey),
-              onTap:
-                  isAssignedToYou
-                      ? () => _handleTakePhoto(task)
-                      : null, // Disable tap if not yours
+              trailing: isAssignedToYou
+                  ? Image.asset(
+                      'assets/icons/camera.png',
+                      width: 24,
+                      height: 24,
+                      color: Colors.orange,
+                    )
+                  : Icon(Icons.lock_outline, color: Colors.grey),
+              onTap: isAssignedToYou
+                  ? () => _handleTakePhoto(task)
+                  : null, // Disable tap if not yours
             ),
           );
         }),
-        // Header for the Completed Tasks section
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
@@ -100,45 +83,38 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
-        // Map over completed tasks to display them in a Card widget
         ...completedTasks.map(
           (task) => Card(
             margin: EdgeInsets.all(8),
             child: ListTile(
-              title: Text(task.title), // Display the task title
+              title: Text(task.title),
               subtitle: Text("Completed by: ${task.creator}"),
-              // Leading displays an avatar image of the task creator
               leading: CircleAvatar(
                 backgroundImage: NetworkImage(task.avatarUrl),
               ),
-              // Trailing contains a set of buttons for upvoting and downvoting
               trailing: SizedBox(
-                width: 120, // Fixed width ensures consistent layout
+                width: 120,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Upvote button
                     IconButton(
                       icon: Icon(Icons.thumb_up, color: Colors.green),
                       onPressed: () {
                         setState(() {
-                          task.upvotes++; // Increase upvotes count
+                          task.upvotes++;
                         });
                       },
                     ),
-                    Text("${task.upvotes}"), // Display current upvotes count
-                    // Downvote button
+                    Text("${task.upvotes}"),
                     IconButton(
                       icon: Icon(Icons.thumb_down, color: Colors.red),
                       onPressed: () {
                         setState(() {
-                          task.downvotes++; // Increase downvotes count
+                          task.downvotes++;
                         });
                       },
                     ),
-                    Text(
-                      "${task.downvotes}",
-                    ), // Display current downvotes count
+                    Text("${task.downvotes}"),
                   ],
                 ),
               ),
@@ -154,10 +130,11 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
-      // You now have the image path → you can store, upload, mark as complete, etc.
       print("User completed '${task.title}' with photo: ${pickedFile.path}");
 
-      // Optional: mark task as completed
+      // Mark task as completed via the Firebase service
+      await databaseService.updateTaskStatus(task.id, 'completed');
+
       setState(() {
         task.status = 'completed';
       });

@@ -16,19 +16,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  int userGems = 100;
 
-  // Declare the screens list, but do not initialize it with the groupId yet.
   late List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
-    // Initialize the screens list in the initState method.
     _screens = [
       TaskSwipeScreen(groupId: widget.groupId),
-      CurrentTasksScreen(),
+      CurrentTasksScreen(groupId: widget.groupId),
       LeaderboardScreen(),
-      StoreScreen(), // Add StoreScreen here
+      StoreScreen(
+        userGems: userGems,
+        onGemsChanged: (newGems) {
+          setState(() {
+            userGems = newGems;
+          });
+        },
+      ),
     ];
   }
 
@@ -47,6 +53,31 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(color: Theme.of(context).primaryColor),
         ),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/icons/gem.png',
+                  width: 24,
+                  height: 24,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '$userGems',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        backgroundColor: Colors.white,
+        elevation: 2,
       ),
       body: SafeArea(
         child: IndexedStack(index: _selectedIndex, children: _screens),
@@ -54,10 +85,10 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items:  [
+        items: [
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/tasks.png', // Use the image from assets
+              'assets/icons/tasks.png',
               width: 30,
               height: 30,
             ),
@@ -73,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/leaderboard.png', // Use the image from assets
+              'assets/icons/leaderboard.png',
               width: 30,
               height: 30,
             ),

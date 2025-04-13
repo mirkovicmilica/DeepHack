@@ -17,13 +17,14 @@ class AppRoutes {
   static const currentTasks = '/current-tasks';
   static const leaderboard = '/leaderboard';
   static const authentication = '/authentication';
+  static const store = '/store';
   static const wrapper = "/";
 
   static Map<String, WidgetBuilder> routes = {
     login: (_) => LoginScreen(),
     signup: (_) => SignupScreen(),
     // tasks: (_) => TaskSwipeScreen(),
-    currentTasks: (_) => CurrentTasksScreen(),
+    // currentTasks: (_) => CurrentTasksScreen(),
     leaderboard: (_) => LeaderboardScreen(),
     authentication: (_) => AuthenticationScreen(),
     group: (_) => GroupScreen(),

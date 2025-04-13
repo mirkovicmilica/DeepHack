@@ -90,6 +90,26 @@ class DatabaseService {
     });
   }
 
+  Future<void> removeGroupById(String groupId, String userId) async {
+    // Check if the group exists
+    DocumentSnapshot groupSnapshot = await _db.collection('groups').doc(groupId).get();
+    if (!groupSnapshot.exists) {
+      print("Group not found!");
+      return;
+    }
+
+    // Remove the user from the group's members list
+    await _db.collection('groups').doc(groupId).update({
+      'members': FieldValue.arrayRemove([userId]),
+    });
+
+    // Remove the group from the user's groups list
+    await _db.collection('users').doc(userId).update({
+      'groups': FieldValue.arrayRemove([groupId]),
+    });
+  }
+
+
   Future<Group?> getGroupData(String groupId) async {
     final groupDoc = await _db.collection('groups').doc(groupId).get();
 

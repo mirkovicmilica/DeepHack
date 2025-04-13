@@ -59,3 +59,30 @@ flutter pub get
 ```bash
 flutter run
 ```
+
+## 📸 App Demo Snapshots
+
+<table>
+  <tr>
+    <td><img src="demo_img/preview.jpg" width="250"></td>
+    <td><img src="demo_img/login.jpg" width="250"></td>
+    <td><img src="demo_img/signup.jpg" width="250"></td>
+  </tr>
+  <tr>
+    <td><img src="demo_img/groupdisplay.jpg" width="250"></td>
+    <td><img src="demo_img/creategroup.jpg" width="250"></td>
+    <td><img src="demo_img/addnewtask.jpg" width="250"></td>
+  </tr>
+  <tr>
+    <td><img src="demo_img/taskexample.jpg" width="250"></td>
+    <td><img src="demo_img/taskdecline.jpg" width="250"></td>
+    <td><img src="demo_img/tasklist.jpg" width="250"></td>
+  </tr>
+  <tr> <td><img src="demo_img/completedtask.jpg" width="250"></td>
+    <td><img src="demo_img/leaderboard.jpg" width="250"></td>
+    <td><img src="demo_img/awards.jpg" width="250"></td>
+   
+  </tr>
+</table>
+
+

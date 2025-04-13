@@ -481,7 +481,8 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         onQRViewCreated: (QRViewController controller) {
           controller.scannedDataStream.listen((scanData) {
             widget.onScan(scanData.code ?? "");  // Send the scanned code back to the callback
-            Navigator.pop(context);  // Close the scanner screen after scanning
+            // Navigator.pop(context);  // Close the scanner screen after scanning
+            Navigator.pushReplacementNamed(context, '/group');
           });
         },
       ),

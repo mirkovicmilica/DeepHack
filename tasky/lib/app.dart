@@ -16,8 +16,10 @@ class TaskyApp extends StatelessWidget {
         title: 'Tasky',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255,212, 201, 190), // Set your desired color
+            // seedColor: const Color.fromARGB(255, 241, 239, 236), // Set your desired color
+            seedColor: const Color.fromARGB(255, 120, 120, 120), // Set your desired color
           ),
+          // scaffoldBackgroundColor: Color.fromARGB(255, 245,245,245), // light gray background for all screens,
           scaffoldBackgroundColor: Color.fromARGB(255, 8, 26, 45), // light gray background for all screens
 
           useMaterial3: true, // Enable Material 3 theme

@@ -18,8 +18,19 @@ class TaskyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.pink, // Set your desired color
           ),
+          scaffoldBackgroundColor: Color(
+            0xFFF4F4F4,
+          ), // light gray background for all screens
+
           useMaterial3: true, // Enable Material 3 theme
           visualDensity: VisualDensity.adaptivePlatformDensity,
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+            backgroundColor: Colors.grey[400], // gray bar background
+            selectedItemColor: Colors.white, // active icon/text color
+            unselectedItemColor: Colors.grey[300], // inactive icon/text color
+            showUnselectedLabels: true,
+            type: BottomNavigationBarType.fixed, // keeps all items visible
+          ),
         ),
         initialRoute: AppRoutes.wrapper,
         routes: AppRoutes.routes,

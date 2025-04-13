@@ -106,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(child: currentScreen),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.grey[600],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: [

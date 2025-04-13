@@ -25,7 +25,9 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
   }
 
   Future<void> _loadTasks() async {
-    final fetchedTasks = await _dbService.getIncompleteTasksForGroup(widget.groupId,);
+    final fetchedTasks = await _dbService.getIncompleteTasksForGroup(
+      widget.groupId,
+    );
     setState(() {
       tasks = fetchedTasks;
       isLoading = false;
@@ -116,6 +118,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       ),
                       child: Container(
                         // Expand to fill available space
+                        color: Colors.grey[250],
                         width: double.infinity,
                         height: double.infinity,
                         padding: EdgeInsets.symmetric(
@@ -126,12 +129,12 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                              Image.asset(
-                                'assets/icons/${task.icon}.png',
-                                width: 230,
-                                height: 230,
-                              ),
-                               SizedBox(height: 16),
+                            Image.asset(
+                              'assets/icons/${task.icon}.png',
+                              width: 230,
+                              height: 230,
+                            ),
+                            SizedBox(height: 16),
                             Text(
                               task.title,
                               style: TextStyle(
@@ -169,7 +172,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                               textAlign: TextAlign.center,
                             ),
                           ],
-                        ),  
+                        ),
                       ),
                     ),
                   );
@@ -196,57 +199,70 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
       builder: (context) {
         return AlertDialog(
           title: Text("Add New Task"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(labelText: 'Task Title'),
-              ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _titleController,
+                  decoration: InputDecoration(labelText: 'Task Title'),
+                ),
 
-              TextField(
-                controller: _rewardController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Reward'),
-              ),
-              TextField(
-                controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
-              ),
+                TextField(
+                  controller: _rewardController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(labelText: 'Reward'),
+                ),
+                TextField(
+                  controller: _descriptionController,
+                  decoration: InputDecoration(labelText: 'Description'),
+                ),
 
-              TextField(
-                controller: _avatarUrlController,
-                decoration: InputDecoration(labelText: 'Avatar URL'),
-              ),
-              DropdownButtonFormField<String>(
-                value: _iconController.text.isNotEmpty ? _iconController.text : null,
-                decoration: InputDecoration(labelText: 'Code'),
-                items: [
-                  'clean-dishes', 'clean-toilet', 'garbage', 'homework',
-                  'iron-clothes', 'laundry', 'lunch',
-                  'pet-food', 'toilet-paper', 'vacum', 'walk-pet'
-                ].map((code) => DropdownMenuItem(
-                      value: code,
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            'assets/icons/$code.png',
-                            width: 30,
-                            height: 30,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(code, style: TextStyle(fontSize: 16)),
-                        ],
-                      ),
-                    ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _iconController.text = value!;
-                  });
-                },
-              ),
-            ],
+                DropdownButtonFormField<String>(
+                  value:
+                      _iconController.text.isNotEmpty
+                          ? _iconController.text
+                          : null,
+                  decoration: InputDecoration(labelText: 'Code'),
+                  items:
+                      [
+                            'clean-dishes',
+                            'clean-toilet',
+                            'garbage',
+                            'homework',
+                            'iron-clothes',
+                            'laundry',
+                            'lunch',
+                            'pet-food',
+                            'toilet-paper',
+                            'vacum',
+                            'walk-pet',
+                          ]
+                          .map(
+                            (code) => DropdownMenuItem(
+                              value: code,
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    'assets/icons/$code.png',
+                                    width: 30,
+                                    height: 30,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(code, style: TextStyle(fontSize: 16)),
+                                ],
+                              ),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _iconController.text = value!;
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(

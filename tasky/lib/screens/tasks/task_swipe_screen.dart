@@ -25,9 +25,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
   }
 
   Future<void> _loadTasks() async {
-    final fetchedTasks = await _dbService.getIncompleteTasksForGroup(
-      widget.groupId,
-    );
+    final fetchedTasks = await _dbService.getIncompleteTasksForGroup(widget.groupId,);
     setState(() {
       tasks = fetchedTasks;
       isLoading = false;
@@ -128,6 +126,12 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                              Image.asset(
+                                'assets/icons/${task.icon}.png',
+                                width: 230,
+                                height: 230,
+                              ),
+                               SizedBox(height: 16),
                             Text(
                               task.title,
                               style: TextStyle(
@@ -143,10 +147,20 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                               textAlign: TextAlign.center,
                             ),
                             SizedBox(height: 8),
-                            Text(
-                              "Reward: ${task.reward} pts",
-                              style: TextStyle(fontSize: 20),
-                              textAlign: TextAlign.center,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "${task.reward}",
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                SizedBox(width: 8),
+                                Image.asset(
+                                  'assets/icons/gem.png',
+                                  width: 30,
+                                  height: 30,
+                                ),
+                              ],
                             ),
                             SizedBox(height: 24),
                             Text(
@@ -155,7 +169,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                               textAlign: TextAlign.center,
                             ),
                           ],
-                        ),
+                        ),  
                       ),
                     ),
                   );
@@ -204,23 +218,39 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                 controller: _avatarUrlController,
                 decoration: InputDecoration(labelText: 'Avatar URL'),
               ),
-              TextField(
-                controller: _iconController,
-                decoration: InputDecoration(labelText: 'Icon Code (numeric)'),
-                keyboardType: TextInputType.number,
+              DropdownButtonFormField<String>(
+                value: _iconController.text.isNotEmpty ? _iconController.text : null,
+                decoration: InputDecoration(labelText: 'Code'),
+                items: [
+                  'clean-dishes', 'clean-toilet', 'garbage', 'homework',
+                  'iron-clothes', 'laundry', 'lunch',
+                  'pet-food', 'toilet-paper', 'vacum', 'walk-pet'
+                ].map((code) => DropdownMenuItem(
+                      value: code,
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            'assets/icons/$code.png',
+                            width: 30,
+                            height: 30,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(code, style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                    ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _iconController.text = value!;
+                  });
+                },
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () async {
-                // Convert icon code to IconData
-                IconData iconData = IconData(
-                  int.tryParse(_iconController.text) ??
-                      Icons.assignment.codePoint,
-                  fontFamily: 'MaterialIcons',
-                );
-
                 // Create the task with the provided values
                 await _dbService.createTask(
                   title: _titleController.text,
@@ -233,7 +263,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       _avatarUrlController.text.isEmpty
                           ? "https://example.com/default_avatar.jpg"
                           : _avatarUrlController.text,
-                  icon: iconData,
+                  icon: _iconController.text,
                 );
 
                 Navigator.of(context).pop();

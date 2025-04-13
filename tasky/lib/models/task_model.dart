@@ -6,7 +6,7 @@ class TaskModel {
   final String title;
   final String creator;
   final int reward;
-  final IconData icon;
+  final String icon;
   final String avatarUrl;
   final String description;
   String imageUrl;
@@ -38,7 +38,7 @@ class TaskModel {
       'title': title,
       'creator': creator,
       'reward': reward,
-      'icon': icon.codePoint, // Store icon code point (icon as integer)
+      'icon': icon,
       'avatarUrl': avatarUrl,
       'description': description,
       'upvotes': upvotes,
@@ -56,10 +56,7 @@ class TaskModel {
       title: map['title'],
       creator: map['creator'],
       reward: map['reward'],
-      icon: IconData(
-        map['icon'],
-        fontFamily: 'MaterialIcons',
-      ), // Convert code point back to IconData
+      icon: map['icon'], // Convert code point back to IconData
       avatarUrl: map['avatarUrl'],
       description: map['description'],
       upvotes: map['upvotes'] ?? 0,
@@ -76,7 +73,7 @@ class TaskModel {
       title: data['title'] ?? '',
       creator: data['createdBy'] ?? '',
       reward: data['reward'] ?? 0,
-      icon: Icons.assignment, // Default icon
+      icon: data['icon'], // Default icon
       avatarUrl: data['avatarUrl'] ?? "https://example.com/default_avatar.jpg",
       description: data['description'] ?? '',
       status: data['status'] ?? 'incomplete',

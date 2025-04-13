@@ -17,6 +17,7 @@ class AppRoutes {
   static const currentTasks = '/current-tasks';
   static const leaderboard = '/leaderboard';
   static const authentication = '/authentication';
+  static const store = '/store';
   static const wrapper = "/";
 
   static Map<String, WidgetBuilder> routes = {

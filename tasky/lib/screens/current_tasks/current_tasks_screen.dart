@@ -7,8 +7,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 // Define a stateful widget for the current tasks screen
 class CurrentTasksScreen extends StatefulWidget {
   final String groupId;
+  final int userGems;
+  final Function(int) onGemsChanged;
 
-  const CurrentTasksScreen({Key? key, required this.groupId}) : super(key: key);
+  const CurrentTasksScreen({
+    Key? key,
+    required this.groupId,
+    required this.userGems,
+    required this.onGemsChanged,
+  }) : super(key: key);
 
   @override
   _CurrentTasksScreenState createState() => _CurrentTasksScreenState();
@@ -16,6 +23,8 @@ class CurrentTasksScreen extends StatefulWidget {
 
 // The mutable state for the CurrentTasksScreen widget
 class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
+  late int userGems;
+
   // Sample list of tasks - normally you might fetch this data from a service
   List<TaskModel> acceptedTasks = [];
   List<TaskModel> completedTasks = [];
@@ -27,8 +36,16 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
   void initState() {
     super.initState();
     currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    userGems = widget.userGems;
 
     _loadTasks();
+  }
+
+  void _updateGems(int newAmount) {
+    setState(() {
+      userGems = newAmount;
+    });
+    widget.onGemsChanged(userGems);
   }
 
   Future<void> _loadTasks() async {
@@ -70,6 +87,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
         ),
         // Map over the assignedTasks to create a list of swipeable items
         ...acceptedTasks.map((task) {
+          print(task);
           final isAssignedToYou = task.assignedTo == currentUserId;
 
           return Card(
@@ -77,7 +95,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
             elevation: 2,
             child: ListTile(
               title: Text(task.title),
-              subtitle: Text("Assigned to: ${task.assignedTo}"),
+              subtitle: Text("Assigned to: ${task.assignedToName}"),
               trailing:
                   isAssignedToYou
                       ? Icon(Icons.pending_actions, color: Colors.orange)
@@ -103,7 +121,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
             margin: EdgeInsets.all(8),
             child: ListTile(
               title: Text(task.title),
-              subtitle: Text("Completed by: ${task.assignedTo}"),
+              subtitle: Text("Completed by: ${task.assignedToName}"),
               leading: CircleAvatar(
                 backgroundImage: NetworkImage(task.avatarUrl),
               ),
@@ -172,8 +190,9 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
         // Update task in Firestore
         await _dbService.completeTask(
           task,
+          currentUserId!,
         ); // make sure this updates the full task including imageUrl
-
+        _updateGems(userGems + task.reward);
         // Update UI
         setState(() {
           acceptedTasks.remove(task);

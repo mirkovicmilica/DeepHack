@@ -1,77 +1,93 @@
 import 'package:flutter/material.dart';
+import 'package:tasky/services/database.dart';
 
-class LeaderboardScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> leaderboard = [
-    {"name": "Eiden", "points": 2430},
-    {"name": "Jackson", "points": 1847},
-    {"name": "Emma", "points": 1674},
-    {"name": "Sebastian", "points": 1124},
-    {"name": "Jason", "points": 875},
-    {"name": "Natalie", "points": 774},
-    {"name": "Serenity", "points": 723},
-    {"name": "Hannah", "points": 559},
-  ];
+class LeaderboardScreen extends StatefulWidget {
+  final String groupId;
+
+  LeaderboardScreen({required this.groupId});
+
+  @override
+  _LeaderboardScreenState createState() => _LeaderboardScreenState();
+}
+
+class _LeaderboardScreenState extends State<LeaderboardScreen> {
+  List<Map<String, dynamic>> leaderboard = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchLeaderboard();
+  }
+
+  Future<void> fetchLeaderboard() async {
+    final snapshot = await DatabaseService().getLeaderboardUsers(
+      widget.groupId,
+    );
+    setState(() {
+      leaderboard = snapshot;
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    print("leadeborad");
+    print(leaderboard);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: 16),
-            Text(
-              "Leaderboard",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            SizedBox(height: 24),
-            _buildTopThree(context),
-            SizedBox(height: 16),
-            Expanded(child: _buildOthers(context)),
-          ],
-        ),
+        child:
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+                  children: [
+                    SizedBox(height: 16),
+                    Text(
+                      "Leaderboard",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    _buildTopThree(context),
+                    SizedBox(height: 16),
+                    Expanded(child: _buildOthers(context)),
+                  ],
+                ),
       ),
     );
   }
 
   Widget _buildTopThree(BuildContext context) {
-    final topThree = leaderboard.take(3).toList();
-    final reordered = [topThree[1], topThree[0], topThree[2]];
+    final count = leaderboard.length;
+
+    if (count == 0) return SizedBox();
+
+    final emojis = ["🥇", "🥈", "🥉"];
+    final items = leaderboard.take(3).toList();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(3, (index) {
-          final user = reordered[index];
-          final originalRank = leaderboard.indexOf(user) + 1;
-
-          final emoji =
-              originalRank == 1
-                  ? "🥇"
-                  : originalRank == 2
-                  ? "🥈"
-                  : "🥉";
-
-          final fontWeight =
-              originalRank == 1 ? FontWeight.bold : FontWeight.normal;
-
-          final fontSize = originalRank == 1 ? 18.0 : 16.0;
-
+        mainAxisAlignment:
+            count == 1
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.spaceEvenly,
+        children: List.generate(items.length, (index) {
+          final user = items[index];
           return Column(
             children: [
-              Text(emoji, style: TextStyle(fontSize: 32)),
+              Text(emojis[index], style: TextStyle(fontSize: 32)),
               SizedBox(height: 8),
               Text(
                 user["name"],
                 style: TextStyle(
                   color: Theme.of(context).primaryColor,
-                  fontWeight: fontWeight,
-                  fontSize: fontSize,
+                  fontWeight: index == 0 ? FontWeight.bold : FontWeight.normal,
+                  fontSize: index == 0 ? 18.0 : 16.0,
                 ),
               ),
               Text(
@@ -122,7 +138,7 @@ class LeaderboardScreen extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              "@username", // replace with actual usernames if you have them
+              user["email"] ?? "",
               style: TextStyle(color: Colors.grey[600], fontSize: 12),
             ),
             trailing: Text(

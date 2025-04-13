@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tasky/services/database.dart';
 import '../tasks/task_swipe_screen.dart';
 import '../current_tasks/current_tasks_screen.dart';
 import '../leaderboard/leaderboard_screen.dart';
@@ -16,18 +18,21 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  int userGems = 100;
+  final DatabaseService _dbService = DatabaseService();
+
+  int userGems = 0;
 
   late List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
+    loadUserData();
+
     _screens = [
       TaskSwipeScreen(groupId: widget.groupId),
-      CurrentTasksScreen(groupId: widget.groupId),
-      LeaderboardScreen(),
-      StoreScreen(
+      CurrentTasksScreen(
+        groupId: widget.groupId,
         userGems: userGems,
         onGemsChanged: (newGems) {
           setState(() {
@@ -35,7 +40,29 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
       ),
+      LeaderboardScreen(groupId: widget.groupId),
+      StoreScreen(
+        userGems: userGems,
+        onGemsChanged: (newGems) async {
+          setState(() {
+            userGems = newGems;
+          });
+          final currentUser = FirebaseAuth.instance.currentUser;
+          if (currentUser != null) {
+            await _dbService.updateUserPoints(currentUser.uid, newGems);
+          }
+        },
+      ),
     ];
+  }
+
+  Future<void> loadUserData() async {
+    final userData = await _dbService.getCurrentUserData();
+    if (userData != null) {
+      setState(() {
+        userGems = userData['points'];
+      });
+    }
   }
 
   void _onItemTapped(int index) {
@@ -56,10 +83,16 @@ class _HomeScreenState extends State<HomeScreen> {
         currentScreen = CurrentTasksScreen(
           key: ValueKey(DateTime.now()), // Force rebuild
           groupId: widget.groupId,
+          userGems: userGems,
+          onGemsChanged: (newGems) {
+            setState(() {
+              userGems = newGems;
+            });
+          },
         );
         break;
       case 2:
-        currentScreen = LeaderboardScreen();
+        currentScreen = LeaderboardScreen(groupId: widget.groupId);
         break;
       case 3:
         currentScreen = StoreScreen(

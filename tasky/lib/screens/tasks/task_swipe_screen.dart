@@ -16,6 +16,8 @@ class TaskSwipeScreen extends StatefulWidget {
 
 class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
   List<TaskModel> tasks = [];
+  Map<String, String> creatorNames = {};
+
   bool isLoading = true;
   final DatabaseService _dbService = DatabaseService();
 
@@ -29,8 +31,20 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
     final fetchedTasks = await _dbService.getIncompleteTasksForGroup(
       widget.groupId,
     );
+
+    // Fetch unique creator IDs
+    final creatorIds = fetchedTasks.map((task) => task.creator).toSet();
+
+    final namesMap = <String, String>{};
+
+    for (final id in creatorIds) {
+      final name = await _dbService.getUserNameById(id);
+      namesMap[id] = name ?? "Unknown";
+    }
+    if (!mounted) return;
     setState(() {
       tasks = fetchedTasks;
+      creatorNames = namesMap;
       isLoading = false;
     });
   }
@@ -112,7 +126,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       } else {
                         print(currentUserId);
                         // Swiped left = accepted
-                        await _dbService.acceptTask(task, currentUserId);
+                        await _dbService.acceptTask(task);
                       }
                     },
                     child: Card(
@@ -150,7 +164,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                             ),
                             SizedBox(height: 16),
                             Text(
-                              "Created by: ${task.creator}",
+                              "Created by: ${creatorNames[task.creator] ?? 'Loading...'}",
                               style: TextStyle(fontSize: 20),
                               textAlign: TextAlign.center,
                             ),

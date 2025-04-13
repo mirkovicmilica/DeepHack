@@ -14,7 +14,8 @@ class DatabaseService {
       'name': name,
       'email': email,
       'createdAt': FieldValue.serverTimestamp(),
-      'groups': [], // Add an empty list for groups
+      'groups': [],
+      'points': 0,
     });
   }
 
@@ -28,6 +29,63 @@ class DatabaseService {
     final data = doc.data()!;
     data['uid'] = uid;
     return data;
+  }
+
+  Future<String?> getUserNameById(String userId) async {
+    try {
+      final doc = await _db.collection('users').doc(userId).get();
+      if (doc.exists) {
+        return doc.data()?['name'] ?? 'Unnamed';
+      }
+    } catch (e) {
+      print("Error fetching user name: $e");
+    }
+    return null;
+  }
+
+  Future<void> updateUserPoints(String userId, int points) async {
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'points': points,
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getLeaderboardUsers(String groupId) async {
+    // Step 1: Get member IDs from the group
+    final groupDoc = await _db.collection('groups').doc(groupId).get();
+
+    if (!groupDoc.exists) {
+      throw Exception("Group not found");
+    }
+
+    final memberIds = List<String>.from(groupDoc.data()?['members'] ?? []);
+
+    if (memberIds.isEmpty) {
+      return []; // no members in group
+    }
+
+    // Step 2: Get user docs filtered by memberIds
+    final userDocs =
+        await _db
+            .collection('users')
+            .where(FieldPath.documentId, whereIn: memberIds.take(10).toList())
+            .get();
+
+    // Step 3: Map and sort users by points
+    final users =
+        userDocs.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'name': data['name'] ?? 'Unnamed',
+            'points': data['points'] ?? 0,
+            'email': data['email'] ?? '',
+            'uid': doc.id,
+          };
+        }).toList();
+
+    // Sort manually because `whereIn` doesn't support ordering
+    users.sort((a, b) => (b['points'] as int).compareTo(a['points'] as int));
+
+    return users;
   }
 
   // Fetch the user's groups
@@ -123,6 +181,7 @@ class DatabaseService {
     required String title,
     required String groupId,
     String? assignedTo,
+    String? assignedToName,
     String? description,
     int reward = 0,
     String status = 'incomplete',
@@ -130,16 +189,19 @@ class DatabaseService {
     String? icon,
     DateTime? dueDate,
   }) async {
-    final currentUserId = _auth.currentUser?.uid;
-    if (currentUserId == null) {
-      throw Exception("User is not logged in");
+    final userData = await getCurrentUserData();
+    if (userData == null) {
+      // handle error
+      return;
     }
+
+    print('ASSIGNED TO');
     print(assignedTo);
     final newTaskRef = await _db.collection('tasks').add({
       'title': title,
       'description': description ?? '',
       'groupId': groupId,
-      'createdBy': currentUserId,
+      'createdBy': userData['uid'],
       'assignedTo': assignedTo,
       'status': status,
       'reward': reward,
@@ -147,7 +209,8 @@ class DatabaseService {
       'icon': icon, // Store icon code point (icon as integer)
       'dueDate': dueDate != null ? Timestamp.fromDate(dueDate) : null,
       'createdAt': FieldValue.serverTimestamp(),
-      'votes': {}, // Initial value
+      'votes': {},
+      'assignedToName': userData['name'],
     });
 
     // Optional: Add task ID to group's task list
@@ -171,21 +234,30 @@ class DatabaseService {
     }).toList();
   }
 
-  Future<void> acceptTask(TaskModel task, String currentUserId) async {
-    print(currentUserId);
+  Future<void> acceptTask(TaskModel task) async {
+    final userData = await getCurrentUserData();
+    if (userData == null) {
+      // handle error
+      return;
+    }
+
     // Update the task in Firestore
     await _db.collection('tasks').doc(task.id).update({
       'status': 'accepted',
-      'assignedTo': currentUserId,
+      'assignedTo': userData['uid'],
+      'assignedToName': userData['name'],
     });
   }
 
-  Future<void> completeTask(TaskModel task) async {
+  Future<void> completeTask(TaskModel task, String userId) async {
     final taskRef = FirebaseFirestore.instance.collection('tasks').doc(task.id);
-    print('COMPLETE SERVICE');
-    print(task);
+    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
 
-    await taskRef.update({'status': 'completed', 'imageUrl': task.imageUrl});
+    // Mark the task as completed
+    await taskRef.update({'status': 'completed'});
+
+    // Atomically increment user's points
+    await userRef.update({'points': FieldValue.increment(task.reward)});
   }
 
   Future<List<TaskModel>> getAssignedTasks(String groupId) async {
@@ -202,6 +274,7 @@ class DatabaseService {
     return snapshot.docs.map((doc) {
       final data = doc.data();
       data['id'] = doc.id;
+      print('DATA');
       print(data);
       return TaskModel.fromFirestore(data);
     }).toList();

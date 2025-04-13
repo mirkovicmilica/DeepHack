@@ -1,4 +1,3 @@
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:tasky/models/task_model.dart'; // Import your Task model
 import 'package:image_picker/image_picker.dart';
@@ -149,22 +148,22 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
       print("User completed '${task.title}' with photo: ${pickedFile.path}");
 
       // Upload image to Firebase Storage
-      final fileName =
-          "${task.id}_${DateTime.now().millisecondsSinceEpoch}.jpg";
-      final storageRef = FirebaseStorage.instance.ref().child(
-        "task_images/$fileName",
-      );
+      // final fileName =
+      //     "${task.id}_${DateTime.now().millisecondsSinceEpoch}.jpg";
+      // final storageRef = FirebaseStorage.instance.ref().child(
+      //   "task_images/$fileName",
+      // );
       print("PHOTO TEST");
       try {
         print("PHOTO TEST 5");
 
-        await storageRef.putData(await pickedFile.readAsBytes());
+        // await storageRef.putData(await pickedFile.readAsBytes());
         print("PHOTO TEST 4");
 
-        final imageUrl = await storageRef.getDownloadURL();
+        // final imageUrl = await storageRef.getDownloadURL();
 
         // Update the task model with the image URL and set status to completed
-        task.imageUrl = imageUrl;
+        // task.imageUrl = imageUrl;
         task.status = 'completed';
         print("PHOTO TEST 3");
 

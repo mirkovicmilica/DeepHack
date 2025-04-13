@@ -91,7 +91,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       margin: EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.green.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       alignment: Alignment.centerLeft,
                       padding: EdgeInsets.only(left: 32),
@@ -108,7 +108,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       margin: EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.red.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       alignment: Alignment.centerRight,
                       padding: EdgeInsets.only(right: 32),
@@ -149,9 +149,11 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       elevation: 8,
                       margin: EdgeInsets.all(16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(26),
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Container(
+                      child:ClipRRect(
+                        borderRadius: BorderRadius.circular(20), // Match this with the Card's borderRadius
+                        child: Container(
                         // Expand to fill available space
                         color: const Color.fromARGB(255, 215, 215, 215),
                         width: double.infinity,
@@ -246,7 +248,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                             ),
                           ],
                         ),
-                      ),
+                      ),),
                     ),
                   );
                 },

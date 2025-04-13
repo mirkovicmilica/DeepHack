@@ -53,7 +53,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                 child: Text(
                   "No tasks found",
                   style: TextStyle(
-                    color: Colors.white, // Set the text color to white
+                    color: Colors.black, // Set the text color to white
                     fontSize: 24, // Increase the font size
                     fontWeight: FontWeight.bold, // Optional: make it bold
                   ),
@@ -139,7 +139,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       ),
                       child: Container(
                         // Expand to fill available space
-                        color: Colors.grey[250],
+                        color: const Color.fromARGB(255,215,215,215),
                         width: double.infinity,
                         height: double.infinity,
                         padding: EdgeInsets.symmetric(

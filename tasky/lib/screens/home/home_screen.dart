@@ -79,9 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(
           widget.groupName,
-          style: TextStyle(color: Colors.white), // Set title text color to white
+          style: TextStyle(color: Colors.black), // Set title text color to white
         ),
-        iconTheme: IconThemeData(color: Colors.white), // Set icon color to white
+        iconTheme: IconThemeData(color: Colors.black), // Set icon color to white
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   '$userGems',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.white, // Set gem text color to white
+                    color: Colors.black, // Set gem text color to black
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -101,16 +101,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
-        backgroundColor: const Color.fromARGB(255, 18, 52, 88),
+        backgroundColor: const Color.fromARGB(255,205,205,205),
         elevation: 2,
       ),
       body: SafeArea(child: currentScreen),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color.fromARGB(255, 18, 52, 88),
+        backgroundColor: const Color.fromARGB(255,205,205,205),
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.white, // Set selected icon and label color to white
-        unselectedItemColor: Colors.white, // Set unselected icon and label color to white
+        selectedItemColor: Colors.black, // Set selected icon and label color to black
+        unselectedItemColor: Colors.black, // Set unselected icon and label color to black
         items: [
           BottomNavigationBarItem(
             icon: Image.asset('assets/icons/tasks.png', width: 30, height: 30),

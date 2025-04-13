@@ -2,104 +2,81 @@ import 'package:flutter/material.dart';
 
 class LeaderboardScreen extends StatelessWidget {
   final List<Map<String, dynamic>> leaderboard = [
-    {
-      "name": "Jackson",
-      "points": 1847,
-      "avatar": "https://i.pravatar.cc/150?img=12",
-    },
-    {
-      "name": "Eiden",
-      "points": 2430,
-      "avatar": "https://i.pravatar.cc/150?img=8",
-    },
-    {
-      "name": "Emma",
-      "points": 1674,
-      "avatar": "https://i.pravatar.cc/150?img=5",
-    },
-    {
-      "name": "Sebastian",
-      "points": 1124,
-      "avatar": "https://i.pravatar.cc/150?img=4",
-    },
-    {
-      "name": "Jason",
-      "points": 875,
-      "avatar": "https://i.pravatar.cc/150?img=3",
-    },
-    {
-      "name": "Natalie",
-      "points": 774,
-      "avatar": "https://i.pravatar.cc/150?img=2",
-    },
-    {
-      "name": "Serenity",
-      "points": 723,
-      "avatar": "https://i.pravatar.cc/150?img=7",
-    },
-    {
-      "name": "Hannah",
-      "points": 559,
-      "avatar": "https://i.pravatar.cc/150?img=1",
-    },
+    {"name": "Eiden", "points": 2430},
+    {"name": "Jackson", "points": 1847},
+    {"name": "Emma", "points": 1674},
+    {"name": "Sebastian", "points": 1124},
+    {"name": "Jason", "points": 875},
+    {"name": "Natalie", "points": 774},
+    {"name": "Serenity", "points": 723},
+    {"name": "Hannah", "points": 559},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0F172A), // Dark background
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             SizedBox(height: 16),
-            const Text(
+            Text(
               "Leaderboard",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Theme.of(context).primaryColor,
               ),
             ),
             SizedBox(height: 24),
-            _buildTopThree(),
+            _buildTopThree(context),
             SizedBox(height: 16),
-            Expanded(child: _buildOthers()),
+            Expanded(child: _buildOthers(context)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTopThree() {
-    final topThree = leaderboard.take(3).toList(); // First 3
+  Widget _buildTopThree(BuildContext context) {
+    final topThree = leaderboard.take(3).toList();
+    final reordered = [topThree[1], topThree[0], topThree[2]];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(3, (index) {
-          final person = topThree[index];
-          final isFirst = index == 1;
+          final user = reordered[index];
+          final originalRank = leaderboard.indexOf(user) + 1;
+
+          final emoji =
+              originalRank == 1
+                  ? "🥇"
+                  : originalRank == 2
+                  ? "🥈"
+                  : "🥉";
+
+          final fontWeight =
+              originalRank == 1 ? FontWeight.bold : FontWeight.normal;
+
+          final fontSize = originalRank == 1 ? 18.0 : 16.0;
 
           return Column(
             children: [
-              if (isFirst)
-                Icon(Icons.emoji_events, color: Colors.amber, size: 32),
-              CircleAvatar(
-                radius: isFirst ? 40 : 32,
-                backgroundImage: NetworkImage(person["avatar"]),
-              ),
+              Text(emoji, style: TextStyle(fontSize: 32)),
               SizedBox(height: 8),
               Text(
-                person["name"],
+                user["name"],
                 style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: isFirst ? FontWeight.bold : FontWeight.normal,
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: fontWeight,
+                  fontSize: fontSize,
                 ),
               ),
               Text(
-                "${person["points"]} pts",
-                style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                "${user["points"]} pts",
+                style: TextStyle(color: Colors.grey[600], fontSize: 14),
               ),
             ],
           );
@@ -108,12 +85,12 @@ class LeaderboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOthers() {
+  Widget _buildOthers(BuildContext context) {
     final others = leaderboard.skip(3).toList();
 
     return ListView.builder(
       itemCount: others.length,
-      padding: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.only(bottom: 16, top: 8),
       itemBuilder: (context, index) {
         final user = others[index];
         final rank = index + 4;
@@ -121,22 +98,37 @@ class LeaderboardScreen extends StatelessWidget {
         return Container(
           margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
-            color: Color(0xFF1E293B),
+            color: Colors.grey[100],
             borderRadius: BorderRadius.circular(16),
           ),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundImage: NetworkImage(user["avatar"]),
+              radius: 20,
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.15),
+              child: Text(
+                "$rank",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
             ),
-            title: Text(user["name"], style: TextStyle(color: Colors.white)),
+            title: Text(
+              user["name"] ?? "Unnamed",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                color: Colors.black,
+              ),
+            ),
             subtitle: Text(
-              "@username",
-              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+              "@username", // replace with actual usernames if you have them
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
             ),
             trailing: Text(
               "${user["points"]} pts",
               style: TextStyle(
-                color: Colors.tealAccent[100],
+                color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.bold,
               ),
             ),

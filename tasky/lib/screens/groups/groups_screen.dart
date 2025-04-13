@@ -286,61 +286,84 @@ class _GroupScreenState extends State<GroupScreen> {
           children: [
             // Displaying groups as big containers in the center of the screen
             Expanded(
-              child: ListView.builder(
+              child: ListView.separated(
+                padding: EdgeInsets.symmetric(vertical: 8),
                 itemCount: groups.length,
+                separatorBuilder: (_, __) => SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  return Dismissible(
-                    key: Key(groups[index].id),
-                    direction: DismissDirection.endToStart,
-                    confirmDismiss: (direction) async {
-                      return await _confirmDeleteGroup(groups[index].id);
-                    },
-                    onDismissed: (direction) {
-                      setState(() {
-                        groups.removeAt(index);
-                      });
-                    },
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: EdgeInsets.only(right: 20),
-                      child: Icon(Icons.delete, color: Colors.white),
-                    ),
-                    child: Card(
-                      margin: EdgeInsets.all(8),
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          groups[index].name,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  return Center(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        trailing: Icon(Icons.arrow_forward_ios),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => HomeScreen(
-                                    groupName: groups[index].name,
-                                    groupId: groups[index].id,
-                                  ),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 16,
+                          ),
+                          title: Center(
+                            child: Text(
+                              groups[index].name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
                             ),
-                          );
-                        },
+                          ),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 18,
+                            color: Colors.grey[600],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => HomeScreen(
+                                      groupName: groups[index].name,
+                                      groupId: groups[index].id,
+                                    ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   );
                 },
               ),
             ),
+
             // Add Group button
-            ElevatedButton(onPressed: _createGroup, child: Text('Add Group')),
+            SizedBox(height: 20),
+
+            // Add Group Button (Small, with emoji)
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: _createGroup,
+                icon: Text("➕", style: TextStyle(fontSize: 18)),
+                label: Text(
+                  "Add Group",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).primaryColor,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  minimumSize: Size(0, 40), // Smaller height
+                  elevation: 3,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
           ],
         ),
       ),

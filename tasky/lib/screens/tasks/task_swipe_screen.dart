@@ -48,7 +48,17 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
           isLoading
               ? Center(child: CircularProgressIndicator())
               : tasks.isEmpty
-              ? Center(child: Text("No tasks found"))
+              ? Center(
+  child: Text(
+    "No tasks found",
+    style: TextStyle(
+      color: Colors.white,  // Set the text color to white
+      fontSize: 24,          // Increase the font size
+      fontWeight: FontWeight.bold, // Optional: make it bold
+    ),
+  ),
+)
+
               : PageView.builder(
                 controller: _pageController,
                 scrollDirection: Axis.vertical,
@@ -61,7 +71,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                     key: Key('${task.title}-$index'),
                     direction: DismissDirection.horizontal,
                     background: Container(
-                      color: Colors.green.withOpacity(0.2), // subtle green tint
+                      color: Colors.green.withOpacity(0.5), // subtle green tint
                       alignment: Alignment.centerLeft,
                       padding: EdgeInsets.only(left: 32),
                       child: Text(
@@ -76,7 +86,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       ),
                     ),
                     secondaryBackground: Container(
-                      color: Colors.red.withOpacity(0.2), // subtle red tint
+                      color: Colors.red.withOpacity(0.5), // subtle red tint
                       alignment: Alignment.centerRight,
                       padding: EdgeInsets.only(right: 32),
                       child: Text(
@@ -111,70 +121,88 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       }
                     },
                     child: Card(
-                      elevation: 8,
-                      margin: EdgeInsets.all(16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+  elevation: 8,
+  margin: EdgeInsets.all(16),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(16),
+  ),
+  child: Container(
+    // Expand to fill available space
+    color: Colors.grey[250],
+    width: double.infinity,
+    height: double.infinity,
+    padding: EdgeInsets.symmetric(
+      horizontal: 24,
+      vertical: 32,
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween, // Push content down
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Image at the top with top margin
+        Padding(
+          padding: EdgeInsets.only(top: 40), // Top margin for image
+          child: Image.asset(
+            'assets/icons/${task.icon}.png',
+            width: 250,
+            height: 250,
+          ),
+        ),
+        // Expanded space for text elements, pushing them to the bottom
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end, // Align text to the bottom
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Title text
+              Text(
+                task.title,
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              // Row for Nick and Points on the same line
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Nick",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        "${task.reward}",
+                        style: TextStyle(fontSize: 20),
                       ),
-                      child: Container(
-                        // Expand to fill available space
-                        color: Colors.grey[250],
-                        width: double.infinity,
-                        height: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 32,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/icons/${task.icon}.png',
-                              width: 230,
-                              height: 230,
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              task.title,
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              "Created by: ${task.creator}",
-                              style: TextStyle(fontSize: 20),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "${task.reward}",
-                                  style: TextStyle(fontSize: 20),
-                                ),
-                                SizedBox(width: 8),
-                                Image.asset(
-                                  'assets/icons/gem.png',
-                                  width: 30,
-                                  height: 30,
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 24),
-                            Text(
-                              task.description,
-                              style: TextStyle(fontSize: 18),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                      SizedBox(width: 8),
+                      Image.asset(
+                        'assets/icons/gem.png',
+                        width: 30,
+                        height: 30,
                       ),
-                    ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 24),
+              // Description with gray color
+              Text(
+                task.description,
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+
                   );
                 },
               ),
@@ -223,7 +251,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       _iconController.text.isNotEmpty
                           ? _iconController.text
                           : null,
-                  decoration: InputDecoration(labelText: 'Code'),
+                  decoration: InputDecoration(labelText: 'Icon'),
                   items:
                       [
                             'clean-dishes',

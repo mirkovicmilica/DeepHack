@@ -79,9 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(
           widget.groupName,
-          style: TextStyle(color: Theme.of(context).primaryColor),
+          style: TextStyle(color: Colors.white), // Set title text color to white
         ),
-        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+        iconTheme: IconThemeData(color: Colors.white), // Set icon color to white
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   '$userGems',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Theme.of(context).primaryColor,
+                    color: Colors.white, // Set gem text color to white
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -101,14 +101,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 18, 52, 88),
         elevation: 2,
       ),
       body: SafeArea(child: currentScreen),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.grey[600],
+        backgroundColor: const Color.fromARGB(255, 18, 52, 88),
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        selectedItemColor: Colors.white, // Set selected icon and label color to white
+        unselectedItemColor: Colors.white, // Set unselected icon and label color to white
         items: [
           BottomNavigationBarItem(
             icon: Image.asset('assets/icons/tasks.png', width: 30, height: 30),

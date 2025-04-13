@@ -147,8 +147,7 @@ class DatabaseService {
       'icon': icon, // Store icon code point (icon as integer)
       'dueDate': dueDate != null ? Timestamp.fromDate(dueDate) : null,
       'createdAt': FieldValue.serverTimestamp(),
-      'upvotes': 0, // Initial value
-      'downvotes': 0, // Initial value
+      'votes': {}, // Initial value
     });
 
     // Optional: Add task ID to group's task list
@@ -226,14 +225,9 @@ class DatabaseService {
     }).toList();
   }
 
-  Future<void> voteOnTask(String taskId, String groupId, int voteValue) async {
+  Future<void> voteOnTask(String taskId, int voteValue) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
-
-    final taskRef = FirebaseFirestore.instance
-        .collection('groups')
-        .doc(groupId)
-        .collection('tasks')
-        .doc(taskId);
+    final taskRef = FirebaseFirestore.instance.collection('tasks').doc(taskId);
 
     final snapshot = await taskRef.get();
     if (!snapshot.exists) return;
@@ -241,14 +235,12 @@ class DatabaseService {
     final currentVotes = Map<String, dynamic>.from(
       snapshot.data()?['votes'] ?? {},
     );
-
     // Prevent multiple votes from the same user
     if (currentVotes.containsKey(userId) && currentVotes[userId] == voteValue)
       return;
 
     // Update the vote
     currentVotes[userId] = voteValue;
-
     await taskRef.update({'votes': currentVotes});
   }
 }

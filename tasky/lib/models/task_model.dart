@@ -11,9 +11,8 @@ class TaskModel {
   final String description;
   String imageUrl;
   String assignedTo;
-  int upvotes;
-  int downvotes;
   String status; // Can be "assigned", "completed", etc.
+  Map<String, int> votes;
 
   // Constructor
   TaskModel({
@@ -25,10 +24,9 @@ class TaskModel {
     required this.avatarUrl,
     required this.description,
     this.assignedTo = '',
-    this.upvotes = 0,
-    this.downvotes = 0,
     this.status = 'assigned', // Default status is 'assigned'
     this.imageUrl = '',
+    this.votes = const {},
   });
 
   // Method to convert Task object to a map (for saving or JSON parsing)
@@ -41,11 +39,10 @@ class TaskModel {
       'icon': icon,
       'avatarUrl': avatarUrl,
       'description': description,
-      'upvotes': upvotes,
-      'downvotes': downvotes,
       'status': status,
       'assignedTo': assignedTo,
       'imageUrl': imageUrl,
+      'votes': votes,
     };
   }
 
@@ -59,11 +56,10 @@ class TaskModel {
       icon: map['icon'], // Convert code point back to IconData
       avatarUrl: map['avatarUrl'],
       description: map['description'],
-      upvotes: map['upvotes'] ?? 0,
-      downvotes: map['downvotes'] ?? 0,
       status: map['status'] ?? 'assigned',
       assignedTo: map['assignedTo'] ?? '',
       imageUrl: map['imageUrl'] ?? '',
+      votes: Map<String, int>.from(map['votes'] ?? {}),
     );
   }
 
@@ -77,12 +73,14 @@ class TaskModel {
       avatarUrl: data['avatarUrl'] ?? "https://example.com/default_avatar.jpg",
       description: data['description'] ?? '',
       status: data['status'] ?? 'incomplete',
-      upvotes: data['upvotes'] ?? 0,
-      downvotes: data['downvotes'] ?? 0,
       assignedTo: data['assignedTo'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
+      votes: Map<String, int>.from(data['votes'] ?? {}),
     );
   }
+
+  int get upvotes => votes.values.where((v) => v == 1).length;
+  int get downvotes => votes.values.where((v) => v == -1).length;
 
   // Optionally, you can add a toString method for easy debugging
   @override

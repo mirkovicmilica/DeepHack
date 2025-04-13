@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tasky/models/group.dart';
 import 'package:tasky/screens/home/home_screen.dart';
@@ -6,7 +7,6 @@ import 'package:tasky/services/database.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-
 
 class GroupScreen extends StatefulWidget {
   @override
@@ -35,7 +35,9 @@ class _GroupScreenState extends State<GroupScreen> {
       if (status.isDenied) {
         // The user denied the permission
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Camera permission is required to scan QR codes')),
+          SnackBar(
+            content: Text('Camera permission is required to scan QR codes'),
+          ),
         );
         return;
       }
@@ -137,26 +139,27 @@ class _GroupScreenState extends State<GroupScreen> {
         }
       } else if (groupName == 'add') {
         // Ask for group ID if 'Add by Group ID' is selected
-       // String? groupId = await _showGroupIdDialog();
+        // String? groupId = await _showGroupIdDialog();
         //if (groupId != null && groupId.isNotEmpty) {
-          // Add user to existing group
-          //await _dbService.addGroupById(groupId, userId!);
-          //_loadUserData(); // Reload groups after adding to the group
-          await _requestCameraPermission();
-          Navigator.pop(context); // close dialog
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => QrScannerScreen(
-                onScan: (groupId) async {
-                  if (groupId.isNotEmpty) {
-                    await _dbService.addGroupById(groupId, userId!);
-                    _loadUserData(); // Reload groups after adding to the group
-                  }
-                },
-              ),
-            ),
-          );
+        // Add user to existing group
+        //await _dbService.addGroupById(groupId, userId!);
+        //_loadUserData(); // Reload groups after adding to the group
+        await _requestCameraPermission();
+        Navigator.pop(context); // close dialog
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => QrScannerScreen(
+                  onScan: (groupId) async {
+                    if (groupId.isNotEmpty) {
+                      await _dbService.addGroupById(groupId, userId!);
+                      _loadUserData(); // Reload groups after adding to the group
+                    }
+                  },
+                ),
+          ),
+        );
         //}
       }
     }
@@ -293,6 +296,10 @@ class _GroupScreenState extends State<GroupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(
+      "Currently logged-in user: ${FirebaseAuth.instance.currentUser?.uid}",
+    );
+
     return Scaffold(
       appBar: AppBar(
         actions: <Widget>[
@@ -340,11 +347,16 @@ class _GroupScreenState extends State<GroupScreen> {
                 itemBuilder: (context, index) {
                   return Dismissible(
                     key: Key(groups[index].id),
-                    direction: DismissDirection.horizontal, // Allow horizontal swipe (both directions)
+                    direction:
+                        DismissDirection
+                            .horizontal, // Allow horizontal swipe (both directions)
                     confirmDismiss: (direction) async {
                       if (direction == DismissDirection.endToStart) {
                         // Left swipe -> delete group
-                        return await _confirmDeleteGroup(groups[index].name, groups[index].id);
+                        return await _confirmDeleteGroup(
+                          groups[index].name,
+                          groups[index].id,
+                        );
                       } else if (direction == DismissDirection.startToEnd) {
                         // Right swipe -> show QR code
                         _showQRCode(groups[index].id);
@@ -355,10 +367,12 @@ class _GroupScreenState extends State<GroupScreen> {
                     onDismissed: (direction) {
                       if (direction == DismissDirection.endToStart) {
                         setState(() {
-                          groups.removeAt(index); // Remove the group from the list if deleted
+                          groups.removeAt(
+                            index,
+                          ); // Remove the group from the list if deleted
                         });
                       }
-                    }
+                    },
                     /*direction: DismissDirection.endToStart,
                     confirmDismiss: (direction) async {
                       return await _confirmDeleteGroup(groups[index].name, groups[index].id);
@@ -367,7 +381,7 @@ class _GroupScreenState extends State<GroupScreen> {
                       setState(() {
                         groups.removeAt(index);
                       });
-                    }*/,
+                    }*/
                     secondaryBackground: Container(
                       color: Colors.red,
                       alignment: Alignment.centerRight,
@@ -422,34 +436,32 @@ class _GroupScreenState extends State<GroupScreen> {
 
   // Method to show the QR code in a dialog
   void _showQRCode(String groupId) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text('QR Code for Group'),
-        content: SizedBox(
-          width: 250,  // Set a fixed width for the QR code
-          height: 250, // Set a fixed height for the QR code
-          child: QrImageView(
-            data: groupId, 
-            size: 250.0,    
-            version: QrVersions.auto, 
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('QR Code for Group'),
+          content: SizedBox(
+            width: 250, // Set a fixed width for the QR code
+            height: 250, // Set a fixed height for the QR code
+            child: QrImageView(
+              data: groupId,
+              size: 250.0,
+              version: QrVersions.auto,
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Close the dialog
-            },
-            child: Text('Close'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class QrScannerScreen extends StatefulWidget {
@@ -472,7 +484,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         leading: IconButton(
           icon: Icon(Icons.close),
           onPressed: () {
-            Navigator.pop(context);  // Close the scanner screen
+            Navigator.pop(context); // Close the scanner screen
           },
         ),
       ),
@@ -480,7 +492,9 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         key: qrKey,
         onQRViewCreated: (QRViewController controller) {
           controller.scannedDataStream.listen((scanData) {
-            widget.onScan(scanData.code ?? "");  // Send the scanned code back to the callback
+            widget.onScan(
+              scanData.code ?? "",
+            ); // Send the scanned code back to the callback
             // Navigator.pop(context);  // Close the scanner screen after scanning
             Navigator.pushReplacementNamed(context, '/group');
           });
@@ -488,7 +502,6 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       ),
     );
   }
-
 }
 
 /*class QrScannerScreen extends StatelessWidget {

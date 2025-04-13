@@ -314,6 +314,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                             'vacum',
                             'walk-pet',
                             'missing',
+                            'groceries','medicine','report','lawn-mower','mop','coffee','shopping',
                           ]
                           .map(
                             (code) => DropdownMenuItem(

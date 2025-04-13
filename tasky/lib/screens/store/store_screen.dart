@@ -17,11 +17,14 @@ class _StoreScreenState extends State<StoreScreen> {
 
   final List<StoreItem> items = [
     StoreItem(name: 'massage', imagePath: 'assets/icons/massage.png', gems: 50),
-    StoreItem(name: 'movie', imagePath: 'assets/icons/movie.png', gems: 80),
-    StoreItem(name: 'dinner', imagePath: 'assets/icons/dinner.png', gems: 75),
-    StoreItem(name: '1', imagePath: 'assets/icons/coin.png', gems: 20),
-    StoreItem(name: '10', imagePath: 'assets/icons/coins.png', gems: 100),
-    StoreItem(name: '100', imagePath: 'assets/icons/euros.png', gems: 500),
+    StoreItem(name: 'movie', imagePath: 'assets/icons/movie.png', gems: 90),
+    StoreItem(name: 'dinner', imagePath: 'assets/icons/dinner.png', gems: 175),
+    StoreItem(name: 'beach', imagePath: 'assets/icons/beach.png', gems: 375),
+    StoreItem(name: 'night out', imagePath: 'assets/icons/night-out.png', gems: 200),
+    StoreItem(name: 'picnic', imagePath: 'assets/icons/picnic.png', gems: 70),
+    StoreItem(name: '1€', imagePath: 'assets/icons/coin.png', gems: 20),
+    StoreItem(name: '10€', imagePath: 'assets/icons/coins.png', gems: 100),
+    StoreItem(name: '100€', imagePath: 'assets/icons/euros.png', gems: 500),
   ];
 
   @override

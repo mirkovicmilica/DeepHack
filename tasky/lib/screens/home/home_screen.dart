@@ -58,11 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.only(right: 16),
             child: Row(
               children: [
-                Image.asset(
-                  'assets/icons/gem.png',
-                  width: 24,
-                  height: 24,
-                ),
+                Image.asset('assets/icons/gem.png', width: 24, height: 24),
                 const SizedBox(width: 6),
                 Text(
                   '$userGems',
@@ -83,15 +79,12 @@ class _HomeScreenState extends State<HomeScreen> {
         child: IndexedStack(index: _selectedIndex, children: _screens),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.grey[600],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: [
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/tasks.png',
-              width: 30,
-              height: 30,
-            ),
+            icon: Image.asset('assets/icons/tasks.png', width: 30, height: 30),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
@@ -111,11 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Leaderboard',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/store.png',
-              width: 30,
-              height: 30,
-            ),
+            icon: Image.asset('assets/icons/store.png', width: 30, height: 30),
             label: 'Store',
           ),
         ],

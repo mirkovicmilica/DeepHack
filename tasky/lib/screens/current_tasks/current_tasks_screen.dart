@@ -38,6 +38,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
     final fetchedCompletedTasks = await _dbService.getCompletedTasks(
       widget.groupId,
     );
+    if (!mounted) return;
     setState(() {
       acceptedTasks = fetchedAcceptedTasks;
       completedTasks = fetchedCompletedTasks;

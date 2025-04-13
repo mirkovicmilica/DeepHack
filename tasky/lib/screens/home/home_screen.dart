@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _screens = [
       TaskSwipeScreen(groupId: widget.groupId),
-      CurrentTasksScreen(groupId: widget.groupId),
+      CurrentTasksScreen(),
       LeaderboardScreen(),
       StoreScreen(
         userGems: userGems,

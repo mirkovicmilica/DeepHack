@@ -107,7 +107,7 @@ class DatabaseService {
     int reward = 0,
     String status = 'incomplete',
     String avatarUrl = 'https://example.com/default_avatar.jpg',
-    IconData icon = Icons.assignment,
+    String? icon,
     DateTime? dueDate,
   }) async {
     final currentUserId = _auth.currentUser?.uid;
@@ -124,7 +124,7 @@ class DatabaseService {
       'status': status,
       'reward': reward,
       'avatarUrl': avatarUrl,
-      'icon': icon.codePoint, // Store icon code point (icon as integer)
+      'icon': icon, // Store icon code point (icon as integer)
       'dueDate': dueDate != null ? Timestamp.fromDate(dueDate) : null,
       'createdAt': FieldValue.serverTimestamp(),
       'upvotes': 0, // Initial value

@@ -36,7 +36,7 @@ class Task {
       'title': title,
       'creator': creator,
       'reward': reward,
-      'icon': icon, // Store icon code point (icon as integer)
+      'icon': icon,
       'avatarUrl': avatarUrl,
       'description': description,
       'upvotes': upvotes,

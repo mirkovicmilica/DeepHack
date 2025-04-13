@@ -16,18 +16,18 @@ class TaskyApp extends StatelessWidget {
         title: 'Tasky',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.pink, // Set your desired color
+            seedColor: const Color.fromARGB(255, 255, 255, 255), // Set your desired color
+            // seedColor: const Color.fromARGB(255, 120, 120, 120), // Set your desired color
           ),
-          scaffoldBackgroundColor: Color(
-            0xFFF4F4F4,
-          ), // light gray background for all screens
+          // scaffoldBackgroundColor: Color.fromARGB(255, 8, 26, 45), // light gray background for all screens
+          scaffoldBackgroundColor: Color.fromARGB(255, 245,245,245), // light gray background for all screens,
 
           useMaterial3: true, // Enable Material 3 theme
           visualDensity: VisualDensity.adaptivePlatformDensity,
           bottomNavigationBarTheme: BottomNavigationBarThemeData(
-            backgroundColor: Colors.grey[400], // gray bar background
-            selectedItemColor: Colors.white, // active icon/text color
-            unselectedItemColor: Colors.grey[300], // inactive icon/text color
+            backgroundColor: const Color.fromARGB(255, 255, 2, 187), // gray bar background
+            selectedItemColor: const Color.fromARGB(255, 0,0,0), // active icon/text color
+            unselectedItemColor: const Color.fromARGB(255, 0,0,0), // inactive icon/text color
             showUnselectedLabels: true,
             type: BottomNavigationBarType.fixed, // keeps all items visible
           ),

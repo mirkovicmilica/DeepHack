@@ -139,7 +139,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       ),
                       child: Container(
                         // Expand to fill available space
-                        color: const Color.fromARGB(255,215,215,215),
+                        color: const Color.fromARGB(255, 215, 215, 215),
                         width: double.infinity,
                         height: double.infinity,
                         padding: EdgeInsets.symmetric(
@@ -241,6 +241,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
     final _descriptionController = TextEditingController();
     final _avatarUrlController = TextEditingController();
     final _iconController = TextEditingController();
+    _iconController.text = 'missing';
 
     showDialog(
       context: context,
@@ -285,6 +286,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                             'toilet-paper',
                             'vacum',
                             'walk-pet',
+                            'missing',
                           ]
                           .map(
                             (code) => DropdownMenuItem(

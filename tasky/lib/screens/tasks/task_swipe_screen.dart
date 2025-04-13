@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tasky/models/task_model.dart';
 import 'package:image_picker/image_picker.dart';
@@ -66,6 +67,9 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                 itemBuilder: (context, index) {
                   int taskIndex = index % tasks.length;
                   final task = tasks[taskIndex];
+                  print(
+                    "Currently logged-in user: ${FirebaseAuth.instance.currentUser?.uid}",
+                  );
 
                   return Dismissible(
                     key: Key('${task.title}-$index'),
@@ -116,6 +120,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                           SnackBar(content: Text("${task.title} declined")),
                         );
                       } else {
+                        print(currentUserId);
                         // Swiped left = accepted
                         await _dbService.acceptTask(task, currentUserId);
                       }

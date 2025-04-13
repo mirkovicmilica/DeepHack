@@ -90,7 +90,8 @@ class DatabaseService {
 
   Future<void> removeGroupById(String groupId, String userId) async {
     // Check if the group exists
-    DocumentSnapshot groupSnapshot = await _db.collection('groups').doc(groupId).get();
+    DocumentSnapshot groupSnapshot =
+        await _db.collection('groups').doc(groupId).get();
     if (!groupSnapshot.exists) {
       print("Group not found!");
       return;
@@ -106,7 +107,6 @@ class DatabaseService {
       'groups': FieldValue.arrayRemove([groupId]),
     });
   }
-
 
   Future<Group?> getGroupData(String groupId) async {
     final groupDoc = await _db.collection('groups').doc(groupId).get();
@@ -134,7 +134,7 @@ class DatabaseService {
     if (currentUserId == null) {
       throw Exception("User is not logged in");
     }
-
+    print(assignedTo);
     final newTaskRef = await _db.collection('tasks').add({
       'title': title,
       'description': description ?? '',
@@ -173,6 +173,7 @@ class DatabaseService {
   }
 
   Future<void> acceptTask(TaskModel task, String currentUserId) async {
+    print(currentUserId);
     // Update the task in Firestore
     await _db.collection('tasks').doc(task.id).update({
       'status': 'accepted',
@@ -223,5 +224,31 @@ class DatabaseService {
       data['id'] = doc.id;
       return TaskModel.fromFirestore(data);
     }).toList();
+  }
+
+  Future<void> voteOnTask(String taskId, String groupId, int voteValue) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    final taskRef = FirebaseFirestore.instance
+        .collection('groups')
+        .doc(groupId)
+        .collection('tasks')
+        .doc(taskId);
+
+    final snapshot = await taskRef.get();
+    if (!snapshot.exists) return;
+
+    final currentVotes = Map<String, dynamic>.from(
+      snapshot.data()?['votes'] ?? {},
+    );
+
+    // Prevent multiple votes from the same user
+    if (currentVotes.containsKey(userId) && currentVotes[userId] == voteValue)
+      return;
+
+    // Update the vote
+    currentVotes[userId] = voteValue;
+
+    await taskRef.update({'votes': currentVotes});
   }
 }

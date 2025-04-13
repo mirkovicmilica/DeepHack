@@ -69,14 +69,14 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
         ),
         // Map over the assignedTasks to create a list of swipeable items
         ...acceptedTasks.map((task) {
-          final isAssignedToYou = task.creator == currentUserId;
+          final isAssignedToYou = task.assignedTo == currentUserId;
 
           return Card(
             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             elevation: 2,
             child: ListTile(
               title: Text(task.title),
-              subtitle: Text("Assigned to: ${task.creator}"),
+              subtitle: Text("Assigned to: ${task.assignedTo}"),
               trailing:
                   isAssignedToYou
                       ? Icon(Icons.pending_actions, color: Colors.orange)
@@ -102,7 +102,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
             margin: EdgeInsets.all(8),
             child: ListTile(
               title: Text(task.title),
-              subtitle: Text("Completed by: ${task.creator}"),
+              subtitle: Text("Completed by: ${task.assignedTo}"),
               leading: CircleAvatar(
                 backgroundImage: NetworkImage(task.avatarUrl),
               ),
@@ -112,20 +112,34 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.thumb_up, color: Colors.green),
-                      onPressed: () {
-                        setState(() {
-                          task.upvotes++;
-                        });
+                      icon: Icon(
+                        Icons.thumb_up,
+                        color:
+                            task.votes[currentUserId] == 1
+                                ? Colors.green
+                                : Colors.grey,
+                      ),
+                      onPressed: () async {
+                        await _dbService.voteOnTask(task.id, widget.groupId, 1);
+                        _loadTasks(); // reload to reflect change
                       },
                     ),
                     Text("${task.upvotes}"),
                     IconButton(
-                      icon: Icon(Icons.thumb_down, color: Colors.red),
-                      onPressed: () {
-                        setState(() {
-                          task.downvotes++;
-                        });
+                      icon: Icon(
+                        Icons.thumb_down,
+                        color:
+                            task.votes[currentUserId] == -1
+                                ? Colors.red
+                                : Colors.grey,
+                      ),
+                      onPressed: () async {
+                        await _dbService.voteOnTask(
+                          task.id,
+                          widget.groupId,
+                          -1,
+                        );
+                        _loadTasks();
                       },
                     ),
                     Text("${task.downvotes}"),

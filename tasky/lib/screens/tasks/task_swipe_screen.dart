@@ -149,7 +149,7 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                       elevation: 8,
                       margin: EdgeInsets.all(16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(26),
                       ),
                       child: Container(
                         // Expand to fill available space
@@ -200,10 +200,21 @@ class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        "Created by: ${creatorNames[task.creator] ?? 'Loading...'}",
-                                        style: TextStyle(fontSize: 20),
-                                      ),
+                                      Row(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 25,
+                                              backgroundImage: AssetImage(
+                                                'assets/icons/user${(task.creator.hashCode % 5) + 1}.png',
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              "${creatorNames[task.creator] ?? 'Loading...'}",
+                                              style: TextStyle(fontSize: 20),
+                                            ),
+                                          ],
+                                        ),
                                       Row(
                                         children: [
                                           Text(

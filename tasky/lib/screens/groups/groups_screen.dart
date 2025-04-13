@@ -71,7 +71,7 @@ class _GroupScreenState extends State<GroupScreen> {
                 ),
                 ListTile(
                   title: Text(
-                    'Add by Group ID',
+                    'Scane QR Code',
                     style: TextStyle(color: Theme.of(context).primaryColor),
                   ),
                   onTap: () => Navigator.pop(context, 'add'),

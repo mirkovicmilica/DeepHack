@@ -98,7 +98,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
               subtitle: Text("Assigned to: ${task.assignedToName}"),
               trailing:
                   isAssignedToYou
-                      ? Icon(Icons.pending_actions, color: Colors.orange)
+                      ? Image.asset('assets/icons/camera.png',width: 30,height: 30,)
                       : Icon(Icons.lock_outline, color: Colors.grey),
               onTap:
                   isAssignedToYou
@@ -123,7 +123,10 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
               title: Text(task.title),
               subtitle: Text("Completed by: ${task.assignedToName}"),
               leading: CircleAvatar(
-                backgroundImage: NetworkImage(task.avatarUrl),
+                radius: 25,
+                backgroundImage: AssetImage(
+                  'assets/icons/user${(task.assignedToName.hashCode % 5) + 1}.png',
+                ),
               ),
               trailing: SizedBox(
                 width: 120,

@@ -23,7 +23,7 @@ class AppRoutes {
     login: (_) => LoginScreen(),
     signup: (_) => SignupScreen(),
     // tasks: (_) => TaskSwipeScreen(),
-    currentTasks: (_) => CurrentTasksScreen(),
+    // currentTasks: (_) => CurrentTasksScreen(),
     leaderboard: (_) => LeaderboardScreen(),
     authentication: (_) => AuthenticationScreen(),
     group: (_) => GroupScreen(),

@@ -1,9 +1,16 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:tasky/models/task.dart'; // Import your Task model
+import 'package:tasky/models/task_model.dart'; // Import your Task model
 import 'package:image_picker/image_picker.dart';
+import 'package:tasky/services/database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 // Define a stateful widget for the current tasks screen
 class CurrentTasksScreen extends StatefulWidget {
+  final String groupId;
+
+  const CurrentTasksScreen({Key? key, required this.groupId}) : super(key: key);
+
   @override
   _CurrentTasksScreenState createState() => _CurrentTasksScreenState();
 }
@@ -11,51 +18,41 @@ class CurrentTasksScreen extends StatefulWidget {
 // The mutable state for the CurrentTasksScreen widget
 class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
   // Sample list of tasks - normally you might fetch this data from a service
-  List<Task> tasks = [
-    Task(
-      id: "123",
-      title: "Clean kitchen",
-      creator: "You",
-      reward: 5,
-      icon: Icons.kitchen,
-      avatarUrl: "https://example.com/your_avatar.jpg",
-      description: "Clean the kitchen thoroughly.",
-      // Note: No status given, so it defaults to null. In our filtering, it must be 'assigned'
-      status: 'assigned',
-    ),
-    Task(
-      id: '1234',
-      title: "Mop floor",
-      creator: "Charlie",
-      reward: 3,
-      icon: Icons.cleaning_services,
-      avatarUrl: "https://example.com/charlie_avatar.jpg",
-      description: "Mop the floor of the living room.",
-      status: 'assigned',
-    ),
-    Task(
-      id: '12',
-      title: "Wash windows",
-      creator: "Alice",
-      reward: 4,
-      icon: Icons.window,
-      avatarUrl: "https://example.com/alice_avatar.jpg",
-      description: "Clean the windows in the house.",
-      status: 'completed', // This task is marked as completed
-      upvotes: 5,
-      downvotes: 1,
-    ),
-  ];
+  List<TaskModel> acceptedTasks = [];
+  List<TaskModel> completedTasks = [];
+  final DatabaseService _dbService = DatabaseService();
+  bool isLoading = true;
+  String? currentUserId;
+
+  @override
+  void initState() {
+    super.initState();
+    currentUserId = FirebaseAuth.instance.currentUser?.uid;
+
+    _loadTasks();
+  }
+
+  Future<void> _loadTasks() async {
+    final fetchedAcceptedTasks = await _dbService.getAssignedTasks(
+      widget.groupId,
+    );
+    final fetchedCompletedTasks = await _dbService.getCompletedTasks(
+      widget.groupId,
+    );
+    setState(() {
+      acceptedTasks = fetchedAcceptedTasks;
+      completedTasks = fetchedCompletedTasks;
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Filter tasks that are assigned based on their 'status' property
-    List<Task> assignedTasks =
-        tasks.where((task) => task.status == 'assigned').toList();
-
-    // Filter tasks that are completed based on their 'status' property
-    List<Task> completedTasks =
-        tasks.where((task) => task.status == 'completed').toList();
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+    print("tasks");
+    print(acceptedTasks);
 
     // Sort the completed tasks in descending order by number of upvotes
     completedTasks.sort((a, b) => b.upvotes.compareTo(a.upvotes));
@@ -72,8 +69,8 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
           ),
         ),
         // Map over the assignedTasks to create a list of swipeable items
-        ...assignedTasks.map((task) {
-          final isAssignedToYou = task.creator == "You";
+        ...acceptedTasks.map((task) {
+          final isAssignedToYou = task.creator == currentUserId;
 
           return Card(
             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -105,43 +102,38 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
           (task) => Card(
             margin: EdgeInsets.all(8),
             child: ListTile(
-              title: Text(task.title), // Display the task title
+              title: Text(task.title),
               subtitle: Text("Completed by: ${task.creator}"),
-              // Leading displays an avatar image of the task creator
               leading: CircleAvatar(
                 backgroundImage: NetworkImage(task.avatarUrl),
               ),
-              // Trailing contains a set of buttons for upvoting and downvoting
               trailing: SizedBox(
-                width: 120, // Fixed width ensures consistent layout
+                width: 120,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Upvote button
                     IconButton(
                       icon: Icon(Icons.thumb_up, color: Colors.green),
                       onPressed: () {
                         setState(() {
-                          task.upvotes++; // Increase upvotes count
+                          task.upvotes++;
                         });
                       },
                     ),
-                    Text("${task.upvotes}"), // Display current upvotes count
-                    // Downvote button
+                    Text("${task.upvotes}"),
                     IconButton(
                       icon: Icon(Icons.thumb_down, color: Colors.red),
                       onPressed: () {
                         setState(() {
-                          task.downvotes++; // Increase downvotes count
+                          task.downvotes++;
                         });
                       },
                     ),
-                    Text(
-                      "${task.downvotes}",
-                    ), // Display current downvotes count
+                    Text("${task.downvotes}"),
                   ],
                 ),
               ),
+              onTap: () => _showCompletedImagePopup(task),
             ),
           ),
         ),
@@ -149,24 +141,82 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
     );
   }
 
-  Future<void> _handleTakePhoto(Task task) async {
+  Future<void> _handleTakePhoto(TaskModel task) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
-      // You now have the image path → you can store, upload, mark as complete, etc.
       print("User completed '${task.title}' with photo: ${pickedFile.path}");
 
-      // Optional: mark task as completed
-      setState(() {
-        task.status = 'completed';
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Photo submitted for '${task.title}'")),
+      // Upload image to Firebase Storage
+      final fileName =
+          "${task.id}_${DateTime.now().millisecondsSinceEpoch}.jpg";
+      final storageRef = FirebaseStorage.instance.ref().child(
+        "task_images/$fileName",
       );
+      print("PHOTO TEST");
+      try {
+        print("PHOTO TEST 5");
+
+        await storageRef.putData(await pickedFile.readAsBytes());
+        print("PHOTO TEST 4");
+
+        final imageUrl = await storageRef.getDownloadURL();
+
+        // Update the task model with the image URL and set status to completed
+        task.imageUrl = imageUrl;
+        task.status = 'completed';
+        print("PHOTO TEST 3");
+
+        // Update task in Firestore
+        await _dbService.completeTask(
+          task,
+        ); // make sure this updates the full task including imageUrl
+        print("PHOTO TEST 2");
+
+        // Update UI
+        setState(() {
+          acceptedTasks.remove(task);
+          completedTasks.add(task);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Task '${task.title}' marked as completed!")),
+        );
+      } catch (e) {
+        print("Error uploading image: $e");
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Failed to upload image.")));
+      }
     } else {
       print("User cancelled photo for ${task.title}");
     }
+  }
+
+  void _showCompletedImagePopup(TaskModel task) {
+    print("SHOW COMPLETE");
+    print(task);
+    if (task.imageUrl.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("No image available for this task.")),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: Text("Completed Task Image"),
+            content: Image.network(task.imageUrl, fit: BoxFit.contain),
+            actions: [
+              TextButton(
+                child: Text("Close"),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+    );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Task model class with upvotes, downvotes, and status
-class Task {
+class TaskModel {
   final String id;
   final String title;
   final String creator;
@@ -9,13 +9,14 @@ class Task {
   final IconData icon;
   final String avatarUrl;
   final String description;
+  String imageUrl;
   String assignedTo;
   int upvotes;
   int downvotes;
   String status; // Can be "assigned", "completed", etc.
 
   // Constructor
-  Task({
+  TaskModel({
     required this.id,
     required this.title,
     required this.creator,
@@ -27,6 +28,7 @@ class Task {
     this.upvotes = 0,
     this.downvotes = 0,
     this.status = 'assigned', // Default status is 'assigned'
+    this.imageUrl = '',
   });
 
   // Method to convert Task object to a map (for saving or JSON parsing)
@@ -43,12 +45,13 @@ class Task {
       'downvotes': downvotes,
       'status': status,
       'assignedTo': assignedTo,
+      'imageUrl': imageUrl,
     };
   }
 
   // Method to create Task object from a map (for parsing from JSON)
-  factory Task.fromMap(Map<String, dynamic> map) {
-    return Task(
+  factory TaskModel.fromMap(Map<String, dynamic> map) {
+    return TaskModel(
       id: map['id'],
       title: map['title'],
       creator: map['creator'],
@@ -63,11 +66,12 @@ class Task {
       downvotes: map['downvotes'] ?? 0,
       status: map['status'] ?? 'assigned',
       assignedTo: map['assignedTo'] ?? '',
+      imageUrl: map['imageUrl'] ?? '',
     );
   }
 
-  factory Task.fromFirestore(Map<String, dynamic> data) {
-    return Task(
+  factory TaskModel.fromFirestore(Map<String, dynamic> data) {
+    return TaskModel(
       id: data['id'],
       title: data['title'] ?? '',
       creator: data['createdBy'] ?? '',
@@ -79,6 +83,7 @@ class Task {
       upvotes: data['upvotes'] ?? 0,
       downvotes: data['downvotes'] ?? 0,
       assignedTo: data['assignedTo'] ?? '',
+      imageUrl: data['imageUrl'] ?? '',
     );
   }
 

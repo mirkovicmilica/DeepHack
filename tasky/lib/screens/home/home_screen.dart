@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Initialize the screens list in the initState method.
     _screens = [
       TaskSwipeScreen(groupId: widget.groupId),
-      CurrentTasksScreen(),
+      CurrentTasksScreen(groupId: widget.groupId),
       LeaderboardScreen(),
       StoreScreen(), // Add StoreScreen here
     ];
@@ -40,27 +40,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget currentScreen;
+
+    switch (_selectedIndex) {
+      case 0:
+        currentScreen = TaskSwipeScreen(groupId: widget.groupId);
+        break;
+      case 1:
+        currentScreen = CurrentTasksScreen(
+          key: ValueKey(DateTime.now()), // Force rebuild
+          groupId: widget.groupId,
+        );
+        break;
+      case 2:
+        currentScreen = LeaderboardScreen();
+        break;
+      case 3:
+        currentScreen = StoreScreen();
+        break;
+      default:
+        currentScreen = TaskSwipeScreen(groupId: widget.groupId);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${widget.groupName}',
+          widget.groupName,
           style: TextStyle(color: Theme.of(context).primaryColor),
         ),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
       ),
-      body: SafeArea(
-        child: IndexedStack(index: _selectedIndex, children: _screens),
-      ),
+      body: SafeArea(child: currentScreen),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items:  [
+        items: [
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/tasks.png', // Use the image from assets
-              width: 30,
-              height: 30,
-            ),
+            icon: Image.asset('assets/icons/tasks.png', width: 30, height: 30),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
@@ -73,18 +89,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/leaderboard.png', // Use the image from assets
+              'assets/icons/leaderboard.png',
               width: 30,
               height: 30,
             ),
             label: 'Leaderboard',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icons/store.png',
-              width: 30,
-              height: 30,
-            ),
+            icon: Image.asset('assets/icons/store.png', width: 30, height: 30),
             label: 'Store',
           ),
         ],

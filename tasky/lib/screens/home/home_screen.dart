@@ -62,7 +62,14 @@ class _HomeScreenState extends State<HomeScreen> {
         currentScreen = LeaderboardScreen();
         break;
       case 3:
-        currentScreen = StoreScreen();
+        currentScreen = StoreScreen(
+          userGems: userGems,
+          onGemsChanged: (newGems) {
+            setState(() {
+              userGems = newGems;
+            });
+          },
+        );
         break;
       default:
         currentScreen = TaskSwipeScreen(groupId: widget.groupId);
@@ -80,11 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.only(right: 16),
             child: Row(
               children: [
-                Image.asset(
-                  'assets/icons/gem.png',
-                  width: 24,
-                  height: 24,
-                ),
+                Image.asset('assets/icons/gem.png', width: 24, height: 24),
                 const SizedBox(width: 6),
                 Text(
                   '$userGems',
@@ -106,14 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: [
-        items: [
           BottomNavigationBarItem(
             icon: Image.asset('assets/icons/tasks.png', width: 30, height: 30),
-            icon: Image.asset(
-              'assets/icons/tasks.png',
-              width: 30,
-              height: 30,
-            ),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
@@ -126,7 +123,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/leaderboard.png',
               'assets/icons/leaderboard.png',
               width: 30,
               height: 30,

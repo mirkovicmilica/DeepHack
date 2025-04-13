@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tasky/models/task.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:tasky/models/task_model.dart';
 import 'package:tasky/models/group.dart';
 import 'package:flutter/material.dart';
 
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   // --- USERS ---
   Future<void> createUser(String uid, String name, String email) async {
@@ -137,7 +139,7 @@ class DatabaseService {
     });
   }
 
-  Future<List<Task>> getIncompleteTasksForGroup(String groupId) async {
+  Future<List<TaskModel>> getIncompleteTasksForGroup(String groupId) async {
     final querySnapshot =
         await _db
             .collection('tasks')
@@ -148,15 +150,60 @@ class DatabaseService {
     return querySnapshot.docs.map((doc) {
       final data = doc.data();
       data['id'] = doc.id;
-      return Task.fromFirestore(data);
+      return TaskModel.fromFirestore(data);
     }).toList();
   }
 
-  Future<void> acceptTask(Task task, String currentUserId) async {
+  Future<void> acceptTask(TaskModel task, String currentUserId) async {
     // Update the task in Firestore
     await _db.collection('tasks').doc(task.id).update({
       'status': 'accepted',
       'assignedTo': currentUserId,
     });
+  }
+
+  Future<void> completeTask(TaskModel task) async {
+    final taskRef = FirebaseFirestore.instance.collection('tasks').doc(task.id);
+    print('COMPLETE SERVICE');
+    print(task);
+
+    await taskRef.update({'status': 'completed', 'imageUrl': task.imageUrl});
+  }
+
+  Future<List<TaskModel>> getAssignedTasks(String groupId) async {
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('tasks')
+            .where('groupId', isEqualTo: groupId)
+            .where(
+              'status',
+              isEqualTo: 'accepted',
+            ) // or other status you prefer
+            .get();
+
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      print(data);
+      return TaskModel.fromFirestore(data);
+    }).toList();
+  }
+
+  Future<List<TaskModel>> getCompletedTasks(String groupId) async {
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('tasks')
+            .where('groupId', isEqualTo: groupId)
+            .where(
+              'status',
+              isEqualTo: 'completed',
+            ) // or other status you prefer
+            .get();
+
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return TaskModel.fromFirestore(data);
+    }).toList();
   }
 }

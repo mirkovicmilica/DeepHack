@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _screens = [
       TaskSwipeScreen(groupId: widget.groupId),
-      CurrentTasksScreen(),
+      CurrentTasksScreen(groupId: widget.groupId),
       LeaderboardScreen(),
       StoreScreen(
         userGems: userGems,
@@ -46,10 +46,39 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget currentScreen;
+
+    switch (_selectedIndex) {
+      case 0:
+        currentScreen = TaskSwipeScreen(groupId: widget.groupId);
+        break;
+      case 1:
+        currentScreen = CurrentTasksScreen(
+          key: ValueKey(DateTime.now()), // Force rebuild
+          groupId: widget.groupId,
+        );
+        break;
+      case 2:
+        currentScreen = LeaderboardScreen();
+        break;
+      case 3:
+        currentScreen = StoreScreen(
+          userGems: userGems,
+          onGemsChanged: (newGems) {
+            setState(() {
+              userGems = newGems;
+            });
+          },
+        );
+        break;
+      default:
+        currentScreen = TaskSwipeScreen(groupId: widget.groupId);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${widget.groupName}',
+          widget.groupName,
           style: TextStyle(color: Theme.of(context).primaryColor),
         ),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
@@ -75,9 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         elevation: 2,
       ),
-      body: SafeArea(
-        child: IndexedStack(index: _selectedIndex, children: _screens),
-      ),
+      body: SafeArea(child: currentScreen),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey[600],
         currentIndex: _selectedIndex,

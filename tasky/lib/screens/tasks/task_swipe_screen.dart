@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tasky/models/task.dart';
+import 'package:tasky/models/task_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tasky/services/database.dart'; // Make sure this is correct
 import 'package:tasky/services/auth.dart';
@@ -14,7 +14,7 @@ class TaskSwipeScreen extends StatefulWidget {
 }
 
 class _TaskSwipeScreenState extends State<TaskSwipeScreen> {
-  List<Task> tasks = [];
+  List<TaskModel> tasks = [];
   bool isLoading = true;
   final DatabaseService _dbService = DatabaseService();
 

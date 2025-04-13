@@ -120,7 +120,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
                                 : Colors.grey,
                       ),
                       onPressed: () async {
-                        await _dbService.voteOnTask(task.id, widget.groupId, 1);
+                        await _dbService.voteOnTask(task.id, 1);
                         _loadTasks(); // reload to reflect change
                       },
                     ),
@@ -134,11 +134,7 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
                                 : Colors.grey,
                       ),
                       onPressed: () async {
-                        await _dbService.voteOnTask(
-                          task.id,
-                          widget.groupId,
-                          -1,
-                        );
+                        await _dbService.voteOnTask(task.id, -1);
                         _loadTasks();
                       },
                     ),
@@ -167,25 +163,15 @@ class _CurrentTasksScreenState extends State<CurrentTasksScreen> {
       // final storageRef = FirebaseStorage.instance.ref().child(
       //   "task_images/$fileName",
       // );
-      print("PHOTO TEST");
       try {
-        print("PHOTO TEST 5");
-
-        // await storageRef.putData(await pickedFile.readAsBytes());
-        print("PHOTO TEST 4");
-
-        // final imageUrl = await storageRef.getDownloadURL();
-
         // Update the task model with the image URL and set status to completed
         // task.imageUrl = imageUrl;
         task.status = 'completed';
-        print("PHOTO TEST 3");
 
         // Update task in Firestore
         await _dbService.completeTask(
           task,
         ); // make sure this updates the full task including imageUrl
-        print("PHOTO TEST 2");
 
         // Update UI
         setState(() {
